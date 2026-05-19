@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.2-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](CHANGELOG.md)
 
 **仓库地址：** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -39,6 +39,8 @@
 |------|------|
 | 可配置快捷入口 | 自定义名称、URL；图标自动取自网站 favicon |
 | 小窗打开 | 点击快捷入口在独立小窗打开（可并存多个） |
+| 摸鱼友好 | 主窗口照常办公/学习，侧栏一键开小窗刷小红书、抖音、Ins 等；小窗关了就收，不占主标签 |
+| 低调并排 | 侧栏只占一条窄列，不像全屏切站那么显眼；需要时焦点切回主窗口即可 |
 | 移动版 (WAP) 默认 | B 站、微博等白名单转 `m.` 域名；其余使用保存的 URL |
 | 纵向列表 | 侧栏仅展示快捷入口，无 iframe 内嵌 |
 | 地址不被篡改 | 存储的配置 URL 始终为用户填写的原始地址（v1.1.1+） |
@@ -73,7 +75,7 @@
 
 ### 首次使用
 
-1. 预置 Outlook、Teams、OneNote 示例，可在设置中修改
+1. 预置语雀、小红书、抖音、Instagram、TikTok 示例，可在设置中修改
 2. 在 **扩展选项** 添加快捷入口（名称 + 完整 URL）
 3. 打开侧边栏，点击入口即可小窗打开
 4. 右上角齿轮进入 **扩展选项** 管理列表

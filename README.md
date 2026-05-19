@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.2-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](CHANGELOG.md)
 
 **Repository:** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -39,6 +39,8 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 |---------|-------------|
 | Custom shortcuts | Name and URL; favicon loaded automatically from each site |
 | Popout on click | Each shortcut opens in a dedicated popout window |
+| Break-time friendly | Keep work in the main window; pop out Xiaohongshu, Douyin, Instagram, etc. beside you—close the small window when done |
+| Low-profile layout | Narrow side panel launcher—less obvious than switching full tabs; focus the main window anytime |
 | Mobile (WAP) by default | Allowlisted `m.` mapping (Bilibili, Weibo); others use saved URL |
 | Vertical list | Side panel is a launcher only—no iframe embedding |
 | Saved URL integrity | Configured URLs are never rewritten in storage (v1.1.1+) |
@@ -73,7 +75,7 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 
 ### First run
 
-1. Sample shortcuts (Outlook, Teams, OneNote) are pre-installed—edit or remove them in options
+1. Sample shortcuts (Yuque, Xiaohongshu, Douyin, Instagram, TikTok) are pre-installed—edit or remove them in options
 2. Open **Extension options** to add shortcuts (name + full `http(s)://` URL)
 3. Open the side panel and click a shortcut to open its popout
 4. Use the gear icon for **Extension options**
@@ -135,7 +137,7 @@ After code changes, click **Reload** on the extensions page.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.1.2** — vertical shortcut list; click opens popout.
+See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.1.3** — vertical shortcut list; click opens popout.
 
 ## Known limitations
 

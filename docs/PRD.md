@@ -6,8 +6,8 @@
 
 | Attribute | Value |
 |-----------|-------|
-| Doc version | v2.1.2 |
-| Product version | 2.1.2 |
+| Doc version | v2.1.3 |
+| Product version | 2.1.3 |
 | Last updated | 2026-05-19 |
 | Status | Open source |
 | Platforms | Microsoft Edge 114+, Google Chrome 114+ |

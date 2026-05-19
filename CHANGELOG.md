@@ -6,6 +6,18 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.1.3] — 2026-05-19
+
+### Changed / 变更
+
+- Default shortcuts on first install: Yuque, Xiaohongshu, Douyin, Instagram, TikTok
+
+### 变更（中文）
+
+- 首次安装预置快捷方式：语雀、小红书、抖音、Instagram、TikTok
+
+---
+
 ## [2.1.2] — 2026-05-19
 
 ### Changed / 变更

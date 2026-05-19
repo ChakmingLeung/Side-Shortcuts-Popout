@@ -40,24 +40,36 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
   if (!(await getShortcuts()).length) {
     await saveShortcuts([
-        {
-          id: crypto.randomUUID(),
-          title: "Outlook",
-          url: "https://outlook.live.com/",
-          mobile: null,
-        },
-        {
-          id: crypto.randomUUID(),
-          title: "Teams",
-          url: "https://teams.microsoft.com/",
-          mobile: null,
-        },
-        {
-          id: crypto.randomUUID(),
-          title: "OneNote",
-          url: "https://www.onenote.com/notebooks",
-          mobile: null,
-        },
+      {
+        id: crypto.randomUUID(),
+        title: "语雀",
+        url: "https://www.yuque.com/",
+        mobile: null,
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "小红书",
+        url: "https://www.xiaohongshu.com/explore",
+        mobile: null,
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "抖音",
+        url: "https://www.douyin.com/jingxuan",
+        mobile: null,
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "Instagram",
+        url: "https://www.instagram.com/",
+        mobile: null,
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "TikTok",
+        url: "https://www.tiktok.com/",
+        mobile: null,
+      },
     ]);
   }
 });
