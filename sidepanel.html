@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+  <head>
+
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Sidebar</title>
+
+    <link rel="stylesheet" href="sidepanel.css" />
+
+  </head>
+
+  <body data-doc-title="docTitleSidepanel">
+
+    <div id="app" class="app">
+
+      <header class="toolbar">
+
+        <h1 class="toolbar-title" data-i18n="launcherLabel">Shortcuts</h1>
+
+        <button type="button" id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings">
+
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+
+            <path
+
+              d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
+
+              stroke="currentColor"
+
+              stroke-width="2"
+
+              fill="none"
+
+            />
+
+            <path
+
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+
+              stroke="currentColor"
+
+              stroke-width="2"
+
+              fill="none"
+
+            />
+
+          </svg>
+
+        </button>
+
+      </header>
+
+
+
+      <main class="main" aria-label="Shortcuts">
+
+        <p class="hint" data-i18n="launcherHint">Click a shortcut to open it in a popout window.</p>
+
+        <ul id="shortcut-list" class="shortcut-list"></ul>
+
+        <p id="empty-state" class="empty-state" hidden>
+
+          <span data-i18n="emptyState">No shortcuts yet.</span>
+
+          <button type="button" id="btn-add-first" class="link-btn" data-i18n="emptyAddFirst">
+
+            Add one
+
+          </button>
+
+        </p>
+
+      </main>
+
+    </div>
+
+    <script type="module" src="sidepanel.js"></script>
+
+  </body>
+
+</html>
+

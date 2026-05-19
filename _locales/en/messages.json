@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Side Shortcuts Popout"
+  },
+  "extDescription": {
+    "message": "Vertical web shortcuts in the side panel; click to open in a popout window alongside the main window."
+  },
+  "actionTitle": {
+    "message": "Open / close Side Shortcuts Popout"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "侧栏快捷小窗"
+  },
+  "extDescription": {
+    "message": "在浏览器侧栏纵向列出网页快捷入口，点击即在独立小窗打开，与主页面并排浏览。"
+  },
+  "actionTitle": {
+    "message": "打开 / 关闭侧栏快捷小窗"
+  }
+}

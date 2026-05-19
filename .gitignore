@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Optional local overrides (do not commit secrets)
+.env
+.env.local
+*.local.json
+
+# Packaged extension artifacts
+*.zip
+*.crx
+*.pem
