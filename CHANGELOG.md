@@ -6,6 +6,19 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.1.4] — 2026-05-19
+
+### Added / 新增
+
+- `scripts/pack-extension.ps1` and GitHub Actions **Release** workflow: tag `v*` uploads installable `.zip`
+- README: install from [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases) (load unpacked)
+
+### 新增（中文）
+
+- 支持打 Release 安装包 zip，用户下载解压后「加载解压缩的扩展」即可使用
+
+---
+
 ## [2.1.3] — 2026-05-19
 
 ### Changed / 变更

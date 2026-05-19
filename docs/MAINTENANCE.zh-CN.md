@@ -13,6 +13,19 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 
 脚本会将版本号同步到 README、PRD、ARCHITECTURE、`docs/README.md` 中的徽章与版本字段。
 
+## 打包 Release（用户下载 zip）
+
+```powershell
+# 本地打包（输出 dist/Side-Shortcuts-Popout-vX.Y.Z.zip）
+powershell -ExecutionPolicy Bypass -File .\scripts\pack-extension.ps1
+
+# 推送到 GitHub 并自动发 Release（需先提交并打 tag）
+git tag v2.1.4
+git push origin v2.1.4
+```
+
+推送 `v*` 标签后，GitHub Actions（`.github/workflows/release.yml`）会自动上传 zip 到 [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)。
+
 ## 每次发版必做（人工）
 
 1. 更新 `manifest.json` → `"version"`
@@ -21,6 +34,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 4. 若用户可见行为变化，更新中英 README 对应小节
 5. 若需求/规则变化，更新 [PRD.zh-CN.md](PRD.zh-CN.md) / [PRD.md](PRD.md)
 6. 若模块或流程变化，更新 [ARCHITECTURE.zh-CN.md](ARCHITECTURE.zh-CN.md) / [ARCHITECTURE.md](ARCHITECTURE.md)
+7. 打 tag `vX.Y.Z` 并推送，生成 GitHub Release 安装包
 
 ## Cursor 自动提醒
 

@@ -21,6 +21,7 @@ npm-debug.log*
 *.local.json
 
 # Packaged extension artifacts
+dist/
 *.zip
 *.crx
 *.pem

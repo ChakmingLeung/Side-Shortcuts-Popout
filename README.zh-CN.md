@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.4-blue.svg)](CHANGELOG.md)
 
 **仓库地址：** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -61,17 +61,30 @@
 
 ## 快速安装
 
-### Microsoft Edge
+### 方式一：下载 Release（推荐，下载即用）
+
+1. 打开 [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases) 页面
+2. 下载最新版的 **`Side-Shortcuts-Popout-v*.zip`**
+3. 解压到任意文件夹（解压后该文件夹根目录应能看到 `manifest.json`）
+4. **Edge：** 打开 `edge://extensions/` → 开启 **开发人员模式** → **加载解压缩的扩展** → 选中解压后的文件夹  
+5. **Chrome：** 打开 `chrome://extensions/` → 开启 **开发者模式** → **加载已解压的扩展程序** → 选中解压后的文件夹  
+6. 点击扩展图标，在侧栏中使用
+
+> 说明：此为开发者模式加载，非应用商店安装；浏览器可能提示「未经验证的扩展」，属正常现象。
+
+### 方式二：克隆源码（开发者）
+
+#### Microsoft Edge
 
 1. `git clone https://github.com/ChakmingLeung/Side-Shortcuts-Popout.git`
 2. 打开 `edge://extensions/`，开启 **开发人员模式**
-3. **加载解压缩的扩展**，选择项目根目录
+3. **加载解压缩的扩展**，选择克隆后的项目根目录
 4. 点击扩展图标，或右键 → **在侧边栏中打开**
 
-### Google Chrome
+#### Google Chrome
 
 1. 打开 `chrome://extensions/`，开启 **开发者模式**
-2. **加载已解压的扩展程序**，选择项目根目录
+2. **加载已解压的扩展程序**，选择克隆后的项目根目录
 
 ### 首次使用
 

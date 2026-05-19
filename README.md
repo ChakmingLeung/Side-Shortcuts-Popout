@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.4-blue.svg)](CHANGELOG.md)
 
 **Repository:** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -61,14 +61,27 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 
 ## Quick start
 
-### Microsoft Edge
+### Option 1: Download a Release (recommended)
+
+1. Open [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)
+2. Download the latest **`Side-Shortcuts-Popout-v*.zip`**
+3. Unzip to a folder (you should see `manifest.json` at the top level)
+4. **Edge:** `edge://extensions/` → **Developer mode** → **Load unpacked** → select that folder  
+5. **Chrome:** `chrome://extensions/` → **Developer mode** → **Load unpacked** → select that folder  
+6. Click the extension icon to open the side panel
+
+> Loaded in developer mode (not from a store). An “unverified extension” notice is normal.
+
+### Option 2: Clone the repo (developers)
+
+#### Microsoft Edge
 
 1. `git clone https://github.com/ChakmingLeung/Side-Shortcuts-Popout.git`
 2. Open `edge://extensions/` and enable **Developer mode**
 3. **Load unpacked** and select the project root
 4. Click the extension icon or right-click → **Open in side panel**
 
-### Google Chrome
+#### Google Chrome
 
 1. Open `chrome://extensions/` and enable **Developer mode**
 2. **Load unpacked** and select the project root
@@ -137,7 +150,7 @@ After code changes, click **Reload** on the extensions page.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.1.3** — vertical shortcut list; click opens popout.
+See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.1.4** — vertical shortcut list; click opens popout.
 
 ## Known limitations
 

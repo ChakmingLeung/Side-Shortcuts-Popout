@@ -13,6 +13,16 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 
 This updates version badges and version lines in README, PRD, ARCHITECTURE, and `docs/README.md`.
 
+## Release zip (end users)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\pack-extension.ps1
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+Pushing a `v*` tag triggers `.github/workflows/release.yml` to attach `Side-Shortcuts-Popout-vX.Y.Z.zip` to [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases).
+
 ## Manual (required every release)
 
 1. **Bump** `manifest.json` → `"version"`
@@ -21,6 +31,7 @@ This updates version badges and version lines in README, PRD, ARCHITECTURE, and 
 4. **Update** feature/behavior sections in bilingual README if user-facing
 5. **Update** [PRD.md](PRD.md) / [PRD.zh-CN.md](PRD.zh-CN.md) if scope or rules change
 6. **Update** [ARCHITECTURE.md](ARCHITECTURE.md) / [ARCHITECTURE.zh-CN.md](ARCHITECTURE.zh-CN.md) if modules or flows change
+7. **Tag** `vX.Y.Z` and push for GitHub Release artifact
 
 ## Cursor AI
 
