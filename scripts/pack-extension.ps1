@@ -37,8 +37,8 @@ $include = @(
 $stage = Join-Path $OutDir "stage"
 $zipPath = Join-Path $OutDir $zipName
 
-if (Test-Path $stage) {
-  Remove-Item -Recurse -Force $stage
+if (Test-Path $OutDir) {
+  Remove-Item -Recurse -Force (Join-Path $OutDir "stage") -ErrorAction SilentlyContinue
 }
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null

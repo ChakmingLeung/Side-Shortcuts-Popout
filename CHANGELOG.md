@@ -6,6 +6,18 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.1.6] — 2026-05-19
+
+### Fixed / 修复
+
+- Release CI: create `dist/stage` before `cp` (fixes exit code 1); publish release via `gh` CLI with `--clobber` for retries
+
+### 修复（中文）
+
+- 修复 Release 打包目录未创建导致失败；发布步骤改用 `gh release` 支持重复上传
+
+---
+
 ## [2.1.5] — 2026-05-19
 
 ### Fixed / 修复
