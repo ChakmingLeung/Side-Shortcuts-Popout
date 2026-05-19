@@ -2,7 +2,7 @@
 
 **Language:** [简体中文](ARCHITECTURE.zh-CN.md) · [English](ARCHITECTURE.md)
 
-| Doc version | 2.1.4 |
+| Doc version | 2.1.5 |
 
 ## 1. Overview
 

@@ -20,11 +20,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\pack-extension.ps1
 
 # 推送到 GitHub 并自动发 Release（需先提交并打 tag）
-git tag v2.1.4
-git push origin v2.1.4
+git tag v2.1.5
+git push origin v2.1.5
 ```
 
 推送 `v*` 标签后，GitHub Actions（`.github/workflows/release.yml`）会自动上传 zip 到 [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)。
+
+**注意：** 在 Actions 里对**旧标签**点「Re-run」仍会用该标签当时的 workflow（例如仍显示 `checkout@v4`）。修复 CI 后请**打新标签**推送，或在 Actions 页选择 **Release → Run workflow**（`workflow_dispatch`）用最新 main 打包。
 
 ## 每次发版必做（人工）
 

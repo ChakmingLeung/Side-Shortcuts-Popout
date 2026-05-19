@@ -6,6 +6,19 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.1.5] — 2026-05-19
+
+### Fixed / 修复
+
+- CI: `checkout@v6`, `action-gh-release@v3`, Node 24 env; fix zip paths; add `workflow_dispatch`
+- Re-run on old tags still uses old workflow — push a new `v*` tag to release
+
+### 修复（中文）
+
+- 修复 Release 工作流；旧标签 Re-run 不会更新 workflow，请使用新标签 `v2.1.5` 或 Actions 手动运行
+
+---
+
 ## [2.1.4] — 2026-05-19
 
 ### Added / 新增

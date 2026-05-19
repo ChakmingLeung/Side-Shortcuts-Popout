@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -23,23 +24,34 @@ jobs:
 
       - name: Pack extension zip
         run: |
+          set -euo pipefail
           VERSION="${{ steps.ver.outputs.version }}"
-          STAGE="dist/stage"
-          ZIP="dist/Side-Shortcuts-Popout-v${VERSION}.zip"
-          mkdir -p "$STAGE" dist
+          STAGE="${GITHUB_WORKSPACE}/dist/stage"
+          ZIP="${GITHUB_WORKSPACE}/dist/Side-Shortcuts-Popout-v${VERSION}.zip"
+          rm -rf "$STAGE"
+          mkdir -p "$(dirname "$ZIP")"
           cp manifest.json background.js shared.js i18n.js \
             sidepanel.html sidepanel.js sidepanel.css \
             options.html options.js options.css \
             LICENSE README.zh-CN.md "$STAGE/"
           cp -r icons _locales "$STAGE/"
           rm -f "$STAGE/icons/source.png" 2>/dev/null || true
-          cd "$STAGE" && zip -r "../../${ZIP}" .
-          ls -la dist/
+          (cd "$STAGE" && zip -rq "$ZIP" .)
+          test -f "$ZIP"
+          ls -la "${GITHUB_WORKSPACE}/dist/"
 
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
           files: dist/Side-Shortcuts-Popout-v${{ steps.ver.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload zip artifact (manual run)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Side-Shortcuts-Popout-v${{ steps.ver.outputs.version }}
+          path: dist/Side-Shortcuts-Popout-v${{ steps.ver.outputs.version }}.zip
