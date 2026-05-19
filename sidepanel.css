@@ -214,7 +214,13 @@ body {
 
 }
 
-
+.hint-pin {
+  margin-top: -6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+}
 
 .shortcut-list {
 

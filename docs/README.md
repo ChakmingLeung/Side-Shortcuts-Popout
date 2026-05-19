@@ -12,6 +12,6 @@
 | Contributing | [CONTRIBUTING.md](../CONTRIBUTING.md) | [CONTRIBUTING.zh-CN.md](../CONTRIBUTING.zh-CN.md) |
 | License | [LICENSE](../LICENSE) | — |
 
-**Current version:** 2.1.6 (see [CHANGELOG.md](../CHANGELOG.md))
+**Current version:** 2.1.7 (see [CHANGELOG.md](../CHANGELOG.md))
 
 GitHub displays [README.md](../README.md) by default. Use the language link at the top of each file to switch.

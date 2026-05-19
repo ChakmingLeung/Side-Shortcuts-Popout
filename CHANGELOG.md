@@ -6,6 +6,18 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.1.7] — 2026-05-19
+
+### Added / 新增
+
+- First-run hint: pin extension to toolbar (side panel, options, README)
+
+### 新增（中文）
+
+- 首次使用说明：建议将扩展固定到工具栏（Pin），侧栏与文档同步更新
+
+---
+
 ## [2.1.6] — 2026-05-19
 
 ### Fixed / 修复

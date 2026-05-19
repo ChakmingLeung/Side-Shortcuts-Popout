@@ -50,6 +50,8 @@ const MESSAGES = {
     toolbarSettings: "管理快捷入口",
     launcherLabel: "快捷入口",
     launcherHint: "点击入口在独立小窗打开；已打开的小窗会聚焦并刷新地址。",
+    pinToolbarHint:
+      "建议将本扩展固定到工具栏：点击浏览器工具栏的扩展图标（拼图）→ 找到「侧栏快捷小窗」→ 点击图钉，之后可一键打开侧栏。",
     emptyState: "还没有快捷入口。",
     emptyAddFirst: "去添加",
     actionTitle: "打开 / 关闭侧栏快捷小窗",
@@ -97,6 +99,8 @@ const MESSAGES = {
     launcherLabel: "Shortcuts",
     launcherHint:
       "Click a shortcut to open it in a popout window. An existing popout is focused and navigated.",
+    pinToolbarHint:
+      "Pin this extension to the toolbar: open the extensions menu (puzzle icon) → find Side Shortcuts Popout → click the pin icon for one-click access.",
     emptyState: "No shortcuts yet.",
     emptyAddFirst: "Add one",
     actionTitle: "Open / close Side Shortcuts Popout",

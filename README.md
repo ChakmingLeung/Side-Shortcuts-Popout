@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.6-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.7-blue.svg)](CHANGELOG.md)
 
 **Repository:** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -68,7 +68,8 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 3. Unzip to a folder (you should see `manifest.json` at the top level)
 4. **Edge:** `edge://extensions/` → **Developer mode** → **Load unpacked** → select that folder  
 5. **Chrome:** `chrome://extensions/` → **Developer mode** → **Load unpacked** → select that folder  
-6. Click the extension icon to open the side panel
+6. **Pin to toolbar (recommended):** Open the **extensions menu (puzzle icon)** → find **Side Shortcuts Popout** → click **Pin** for one-click access to the side panel  
+7. Click the pinned extension icon to open the side panel
 
 > Loaded in developer mode (not from a store). An “unverified extension” notice is normal.
 
@@ -88,10 +89,10 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 
 ### First run
 
-1. Sample shortcuts (Yuque, Xiaohongshu, Douyin, Instagram, TikTok) are pre-installed—edit or remove them in options
-2. Open **Extension options** to add shortcuts (name + full `http(s)://` URL)
-3. Open the side panel and click a shortcut to open its popout
-4. Use the gear icon for **Extension options**
+1. **Pin to toolbar:** Extensions menu (puzzle) → **Side Shortcuts Popout** → Pin, so you can open the side panel anytime  
+2. Sample shortcuts (Yuque, Xiaohongshu, Douyin, Instagram, TikTok) are pre-installed—edit or remove them in options  
+3. Open the side panel and click a shortcut to open its popout  
+4. Manage shortcuts via the **gear** icon in the side panel or **Extension options**
 
 ## Will I lose my shortcuts?
 
@@ -150,7 +151,7 @@ After code changes, click **Reload** on the extensions page.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.1.6** — vertical shortcut list; click opens popout.
+See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.1.7** — vertical shortcut list; click opens popout.
 
 ## Known limitations
 

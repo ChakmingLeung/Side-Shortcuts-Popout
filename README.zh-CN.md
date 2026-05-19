@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.6-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.7-blue.svg)](CHANGELOG.md)
 
 **仓库地址：** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -68,7 +68,8 @@
 3. 解压到任意文件夹（解压后该文件夹根目录应能看到 `manifest.json`）
 4. **Edge：** 打开 `edge://extensions/` → 开启 **开发人员模式** → **加载解压缩的扩展** → 选中解压后的文件夹  
 5. **Chrome：** 打开 `chrome://extensions/` → 开启 **开发者模式** → **加载已解压的扩展程序** → 选中解压后的文件夹  
-6. 点击扩展图标，在侧栏中使用
+6. **将扩展固定到工具栏（推荐）：** 点击浏览器工具栏的 **扩展图标（拼图）** → 在列表中找到 **「侧栏快捷小窗」** → 点击 **图钉** Pin，固定后工具栏一键打开侧栏  
+7. 点击工具栏上的扩展图标，在侧栏中使用
 
 > 说明：此为开发者模式加载，非应用商店安装；浏览器可能提示「未经验证的扩展」，属正常现象。
 
@@ -88,10 +89,10 @@
 
 ### 首次使用
 
-1. 预置语雀、小红书、抖音、Instagram、TikTok 示例，可在设置中修改
-2. 在 **扩展选项** 添加快捷入口（名称 + 完整 URL）
-3. 打开侧边栏，点击入口即可小窗打开
-4. 右上角齿轮进入 **扩展选项** 管理列表
+1. **固定到工具栏（Pin to toolbar）：** 扩展图标（拼图）→ **侧栏快捷小窗** → 图钉固定，便于随时打开侧栏  
+2. 预置语雀、小红书、抖音、Instagram、TikTok 示例，可在设置中修改  
+3. 打开侧栏，点击入口即可在小窗打开  
+4. 需增删改入口：侧栏右上角 **齿轮** 或扩展 **选项** 页
 
 ## 快捷方式会丢失吗？数据存在哪？
 
