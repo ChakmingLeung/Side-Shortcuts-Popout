@@ -8,7 +8,6 @@
 | Agent / 协作 | [AGENTS.md](../AGENTS.md) | — |
 | Product requirements | [PRD.md](PRD.md) | [PRD.zh-CN.md](PRD.zh-CN.md) |
 | Architecture | [ARCHITECTURE.md](ARCHITECTURE.md) | [ARCHITECTURE.zh-CN.md](ARCHITECTURE.zh-CN.md) |
-| GitHub About 文案 | [.github/DESCRIPTION.md](../.github/DESCRIPTION.md) | （中英模板） |
 | Contributing | [CONTRIBUTING.md](../CONTRIBUTING.md) | [CONTRIBUTING.zh-CN.md](../CONTRIBUTING.zh-CN.md) |
 | License | [LICENSE](../LICENSE) | — |
 

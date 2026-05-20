@@ -20,6 +20,9 @@ npm-debug.log*
 .env.local
 *.local.json
 
+# Local-only GitHub About / Release copy (not published)
+.github/DESCRIPTION.md
+
 # Packaged extension artifacts
 dist/
 *.zip

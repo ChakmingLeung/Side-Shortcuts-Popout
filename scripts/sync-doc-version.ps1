@@ -22,8 +22,7 @@ $files = @(
   "docs\PRD.zh-CN.md",
   "docs\ARCHITECTURE.md",
   "docs\ARCHITECTURE.zh-CN.md",
-  "docs\README.md",
-  ".github\DESCRIPTION.md"
+  "docs\README.md"
 )
 
 $badgePattern = 'version-\d+\.\d+\.\d+-blue'

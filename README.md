@@ -12,8 +12,7 @@
 
 A browser extension that brings back a **customizable web shortcut sidebar** using the native Chromium **Side Panel API**—ideal when [Microsoft Edge retires the built-in App Tower](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge). The side panel lists shortcuts vertically; **click to open in a popout window** alongside the main window, with normal cookies and login.
 
-> Docs: [PRD (English)](docs/PRD.md) · [Architecture (English)](docs/ARCHITECTURE.md)  
-> GitHub copy templates: [.github/DESCRIPTION.md](.github/DESCRIPTION.md)
+> Docs: [PRD (English)](docs/PRD.md) · [Architecture (English)](docs/ARCHITECTURE.md)
 
 ---
 

@@ -46,7 +46,7 @@ Project rule `.cursor/rules/github-docs-sync.mdc` is **always on**. When you ask
 | UI in `sidepanel` / `options` | README, PRD, ARCHITECTURE, screenshots note |
 | `theme.js` / appearance | README, ARCHITECTURE, PRD, CHANGELOG |
 | `backup.js` / import-export | README, PRD, ARCHITECTURE, CHANGELOG |
-| `.github/DESCRIPTION.md` | Version and Release template on ship |
+| Local `.github/DESCRIPTION.md` (gitignored) | Paste into GitHub About / Release on ship; not in repo |
 | Bug fix only | CHANGELOG + version bump |
 
 ## Git commit suggestion

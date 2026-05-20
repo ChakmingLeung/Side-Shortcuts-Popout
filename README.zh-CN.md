@@ -12,8 +12,7 @@
 
 在 Microsoft Edge [逐步下线内置侧边栏 App Tower](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge) 的背景下，本扩展通过浏览器原生 **Side Panel（侧边栏）** API，纵向列出可配置的网页快捷入口；**点击即在独立小窗打开**，与主窗口并排浏览，登录态与常规标签页一致。
 
-> 产品文档：[PRD（中文）](docs/PRD.zh-CN.md) · [架构（中文）](docs/ARCHITECTURE.zh-CN.md)  
-> GitHub 仓库文案模板：[.github/DESCRIPTION.md](.github/DESCRIPTION.md)
+> 产品文档：[PRD（中文）](docs/PRD.zh-CN.md) · [架构（中文）](docs/ARCHITECTURE.zh-CN.md)
 
 ---
 

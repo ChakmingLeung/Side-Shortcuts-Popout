@@ -51,7 +51,7 @@ git push origin v2.2.3
 | `sidepanel` / `options` 界面 | README、PRD、ARCHITECTURE、截图说明 |
 | `theme.js` / 主题 | README、ARCHITECTURE、PRD、CHANGELOG |
 | `backup.js` / 导入导出 | README、PRD、ARCHITECTURE、CHANGELOG |
-| `.github/DESCRIPTION.md` | 发版时更新版本与 Release 模板 |
+| 本地 `.github/DESCRIPTION.md`（gitignore） | 发版时手动粘贴至 GitHub About / Release，不推送仓库 |
 | 仅 Bug 修复 | CHANGELOG + 版本号 |
 
 ## 提交信息建议
