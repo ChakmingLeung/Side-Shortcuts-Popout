@@ -30,7 +30,7 @@ jobs:
           ZIP="${GITHUB_WORKSPACE}/dist/Side-Shortcuts-Popout-v${VERSION}.zip"
           rm -rf "${GITHUB_WORKSPACE}/dist"
           mkdir -p "$STAGE"
-          cp manifest.json background.js shared.js i18n.js \
+          cp manifest.json background.js shared.js theme.js backup.js i18n.js \
             sidepanel.html sidepanel.js sidepanel.css \
             options.html options.js options.css \
             LICENSE README.zh-CN.md "$STAGE/"

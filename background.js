@@ -44,31 +44,31 @@ chrome.runtime.onInstalled.addListener(async (details) => {
         id: crypto.randomUUID(),
         title: "语雀",
         url: "https://www.yuque.com/",
-        mobile: null,
+        mobile: true,
       },
       {
         id: crypto.randomUUID(),
         title: "小红书",
         url: "https://www.xiaohongshu.com/explore",
-        mobile: null,
+        mobile: true,
       },
       {
         id: crypto.randomUUID(),
         title: "抖音",
         url: "https://www.douyin.com/jingxuan",
-        mobile: null,
+        mobile: true,
       },
       {
         id: crypto.randomUUID(),
         title: "Instagram",
         url: "https://www.instagram.com/",
-        mobile: null,
+        mobile: true,
       },
       {
         id: crypto.randomUUID(),
         title: "TikTok",
         url: "https://www.tiktok.com/",
-        mobile: null,
+        mobile: true,
       },
     ]);
   }

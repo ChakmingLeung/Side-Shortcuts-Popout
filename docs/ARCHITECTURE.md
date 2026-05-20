@@ -58,7 +58,7 @@ flowchart TD
 | Key | Purpose |
 |-----|---------|
 | `shortcuts` | User entries (saved `url` is canonical) |
-| `settings.defaultMobileMode` | Global mobile default |
+| `shortcut.mobile` | `true` / omitted / `null` → mobile; `false` → desktop |
 | `settings.locale` | `null` = browser; `zh` / `en` |
 | `lastShortcutId` | Last clicked shortcut (highlight) |
 

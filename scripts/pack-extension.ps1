@@ -18,6 +18,8 @@ $include = @(
   "manifest.json",
   "background.js",
   "shared.js",
+  "theme.js",
+  "backup.js",
   "i18n.js",
   "sidepanel.html",
   "sidepanel.js",

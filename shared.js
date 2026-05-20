@@ -4,16 +4,17 @@ const LAST_KEY = "lastShortcutId";
 
 const SETTINGS_KEY = "settings";
 
+/** 开源仓库（设置页作者信息、引流） */
+export const GITHUB_REPO_URL =
+  "https://github.com/ChakmingLeung/Side-Shortcuts-Popout";
+
 
 
 export const DEFAULT_SETTINGS = {
-
-  defaultMobileMode: true,
-
   /** null = follow browser; "zh" | "en" */
-
   locale: null,
-
+  /** "system" | "light" | "dark" */
+  theme: "system",
 };
 
 
@@ -287,25 +288,17 @@ export function toMobileUrl(urlString) {
 
 
 
-export function shouldUseMobile(shortcut, settings) {
-
-  if (shortcut.mobile === true) return true;
-
-  if (shortcut.mobile === false) return false;
-
-  return settings.defaultMobileMode !== false;
-
+/** 未显式关闭时视为移动版（含历史数据 mobile: null） */
+export function shouldUseMobile(shortcut) {
+  return shortcut.mobile !== false;
 }
 
 
 
 export async function resolveLoadUrl(shortcut) {
-
-  const settings = await getSettings();
-
   const canonical = normalizeUrl(shortcut.url);
 
-  if (!shouldUseMobile(shortcut, settings)) {
+  if (!shouldUseMobile(shortcut)) {
 
     return {
 

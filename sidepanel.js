@@ -6,6 +6,7 @@ import {
   createShortcutIcon,
 } from "./shared.js";
 import { initI18n, t, applyDocumentI18n, applyToolbarI18n } from "./i18n.js";
+import { initTheme, applyTheme } from "./theme.js";
 
 const shortcutList = document.getElementById("shortcut-list");
 const emptyState = document.getElementById("empty-state");
@@ -145,6 +146,7 @@ function applySidepanelI18n() {
 }
 
 async function init() {
+  await initTheme();
   await initI18n();
   applySidepanelI18n();
 
@@ -156,17 +158,17 @@ async function init() {
 btnSettings.addEventListener("click", () => chrome.runtime.openOptionsPage());
 btnAddFirst.addEventListener("click", () => chrome.runtime.openOptionsPage());
 
-chrome.storage.onChanged.addListener(async (changes, area) => {
-  if (area !== "sync") return;
+chrome.storage.onChanged.addListener(async (changes) => {
+  if (changes.settings?.newValue) {
+    const settings = changes.settings.newValue;
+    if (settings.theme !== undefined) applyTheme(settings.theme);
+    await initI18n();
+    applySidepanelI18n();
+  }
 
   if (changes.shortcuts) {
     shortcutsCache = changes.shortcuts.newValue ?? [];
     await renderShortcuts(shortcutsCache);
-  }
-
-  if (changes.settings) {
-    await initI18n();
-    applySidepanelI18n();
   }
 });
 

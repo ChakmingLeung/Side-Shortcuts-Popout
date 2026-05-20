@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="system">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,7 +9,34 @@
   <body data-doc-title="docTitleOptions">
     <div class="page">
       <header class="header">
-        <h1 data-i18n="optionsTitle">快捷入口管理</h1>
+        <div class="header-top">
+          <h1 data-i18n="optionsTitle">快捷入口管理</h1>
+          <div class="author-block">
+            <p class="author-line">
+              <span data-i18n="authorLabel">作者</span>
+              <a
+                class="author-link"
+                data-repo-link
+                href="https://github.com/ChakmingLeung/Side-Shortcuts-Popout"
+                target="_blank"
+                rel="noopener noreferrer"
+                >ChakmingLeung</a
+              >
+            </p>
+            <p class="author-cta">
+              <a
+                class="author-repo-link"
+                data-repo-link
+                href="https://github.com/ChakmingLeung/Side-Shortcuts-Popout"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-i18n="authorRepoCta"
+                >GitHub 开源仓库 · 反馈与 Star</a
+              >
+            </p>
+            <p class="author-version" id="extension-version"></p>
+          </div>
+        </div>
         <p class="subtitle" data-i18n="optionsSubtitle">
           配置快捷入口。侧栏纵向列出，点击即在独立小窗打开，与主窗口并排浏览。
         </p>
@@ -17,30 +44,34 @@
 
       <section class="card">
         <h2 data-i18n="globalSettings">全局设置</h2>
-        <label class="field">
-          <span data-i18n="language">界面语言</span>
-          <select id="language">
-            <option value="auto" data-i18n="languageAuto">跟随浏览器</option>
-            <option value="zh" data-i18n="languageZh">简体中文</option>
-            <option value="en" data-i18n="languageEn">English</option>
-          </select>
-        </label>
-        <label class="toggle-row">
-          <input type="checkbox" id="default-mobile" checked />
-          <span data-i18n="defaultMobile">默认以移动版在小窗打开</span>
-        </label>
+        <div class="settings-fields-row">
+          <label class="field">
+            <span data-i18n="language">界面语言</span>
+            <select id="language">
+              <option value="auto" data-i18n="languageAuto">跟随浏览器</option>
+              <option value="zh" data-i18n="languageZh">简体中文</option>
+              <option value="en" data-i18n="languageEn">English</option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="theme">外观主题</span>
+            <select id="theme">
+              <option value="system" data-i18n="themeSystem">跟随系统</option>
+              <option value="light" data-i18n="themeLight">浅色</option>
+              <option value="dark" data-i18n="themeDark">深色</option>
+            </select>
+          </label>
+        </div>
         <p class="field-hint" data-i18n="pinToolbarHint">
           建议将本扩展固定到工具栏：扩展图标（拼图）→「侧栏快捷小窗」→ 图钉。
         </p>
         <p class="field-hint" data-i18n="storagePersistHint">
-          快捷方式会自动保存在本机；登录 Chrome/Edge 并开启同步后可同步到其他设备。重新加载扩展不会清空配置。
-        </p>
-        <p class="field-hint" data-i18n="defaultMobileHint">
-          抖音等站点保持你填写的 www 地址（不转到 m. 域，避免 404），并优化侧栏嵌入；B 站等可按白名单转换移动域名。不会修改已保存的网址。
+          快捷方式会保存在本机；登录 Chrome/Edge 并开启同步可跨设备。重新加载、浏览器更新不会清空；卸载扩展会删除数据，可在「已保存的入口」导出备份后重装再导入。
         </p>
       </section>
 
-      <section class="card">
+      <div class="shortcuts-layout">
+      <section class="card card-form">
         <h2 id="form-title" data-i18n="addShortcut">添加快捷入口</h2>
         <form id="shortcut-form" class="form">
           <input type="hidden" id="edit-id" value="" />
@@ -73,13 +104,13 @@
           <label class="field">
             <span data-i18n="fieldOpenMode">打开方式</span>
             <select id="mobile-mode">
-              <option value="inherit" data-i18n="openModeInherit">
-                跟随全局（默认移动版）
-              </option>
-              <option value="on" data-i18n="openModeOn">始终移动版</option>
-              <option value="off" data-i18n="openModeOff">始终桌面版</option>
+              <option value="on" data-i18n="openModeOn">移动版</option>
+              <option value="off" data-i18n="openModeOff">桌面版</option>
             </select>
           </label>
+          <p class="field-hint" data-i18n="openModeHint">
+            B 站、微博等会转为移动域名；其余站点使用你保存的网址。不会修改已保存的网址。
+          </p>
           <p id="form-error" class="error" hidden></p>
           <div class="form-actions">
             <button type="submit" class="btn primary" id="btn-save" data-i18n="btnSave">
@@ -98,11 +129,76 @@
         </form>
       </section>
 
-      <section class="card">
-        <h2 data-i18n="savedShortcuts">已保存的入口</h2>
+      <section class="card card-list">
+        <div class="card-list-header">
+          <h2 data-i18n="savedShortcuts">已保存的入口</h2>
+          <div class="list-header-actions">
+            <button
+              type="button"
+              id="btn-import-backup"
+              class="btn ghost btn-sm"
+              data-i18n="btnImportBackup"
+            >
+              导入配置
+            </button>
+            <button
+              type="button"
+              id="btn-export-backup"
+              class="btn ghost btn-sm"
+              data-i18n="btnExportBackup"
+            >
+              导出配置
+            </button>
+          </div>
+        </div>
+        <div id="import-panel" class="import-panel" hidden>
+          <button
+            type="button"
+            id="import-panel-close"
+            class="import-panel-close"
+            title="关闭"
+            aria-label="关闭"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M6 6l12 12M18 6L6 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <p class="import-panel-hint" data-i18n="importModePrompt">请选择导入方式：</p>
+          <div class="import-mode-actions">
+            <button
+              type="button"
+              id="import-merge"
+              class="btn ghost btn-sm"
+              data-i18n="importModeMerge"
+            >
+              合并
+            </button>
+            <button
+              type="button"
+              id="import-replace"
+              class="btn ghost btn-sm"
+              data-i18n="importModeReplace"
+            >
+              替换
+            </button>
+          </div>
+        </div>
+        <input
+          type="file"
+          id="import-backup-file"
+          accept=".json,application/json"
+          hidden
+        />
+        <p id="backup-status" class="backup-status" hidden role="status"></p>
         <ul id="manage-list" class="manage-list"></ul>
         <p id="manage-empty" class="empty" hidden data-i18n="manageEmpty">暂无快捷入口</p>
       </section>
+      </div>
     </div>
     <script type="module" src="options.js"></script>
   </body>

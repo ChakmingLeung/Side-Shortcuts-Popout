@@ -105,19 +105,22 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 
 **You will lose data if you:**
 
-- **Uninstall** the extension
+- **Uninstall** the extension (local and sync storage are cleared—**reinstall does not reliably restore** your list)
 - **Clear extension/browsing data** for this extension in browser settings
-- Never had a successful local or sync write (rare)
 
-**Tip:** Stay signed in with sync on; when developing, use **Reload** instead of removing and re-adding the unpacked extension.
+**Tips:**
+
+- Stay signed in with sync for multi-device use while the extension remains installed
+- Before uninstall, device change, or reinstall from the **Edge Add-ons store**: **Options → Backup & restore** → export JSON, then import after reinstall
+- When developing, use **Reload** instead of removing and re-adding the unpacked extension
 
 ## Mobile (WAP) mode
 
-**Open in mobile (WAP) mode** is enabled by default (can be turned off in options):
+New shortcuts **default to mobile**; each entry can be set to desktop in the editor:
 
 - **Allowlisted sites** (Bilibili, Weibo): mobile mode opens the mapped `m.` URL in the popout
 - Saved shortcut URL is never rewritten in storage
-- Per shortcut: follow global / always mobile / always desktop
+- Per shortcut: mobile or desktop
 
 ## Project structure
 

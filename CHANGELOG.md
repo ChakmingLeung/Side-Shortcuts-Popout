@@ -6,6 +6,70 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.2.3] — 2026-05-19
+
+### Changed / 变更
+
+- Options layout: add/edit left, saved list right; inline edit in list; import/export on list header
+- Import panel: merge/replace only; close via top-right icon
+- Author info and version moved to options page title row (right)
+
+### 变更（中文）
+
+- 设置页左右分栏、列表内联编辑；导入/导出移至「已保存的入口」标题栏
+- 导入面板仅保留合并/替换，右上角关闭图标
+- 作者信息与版本号移至页面标题行右侧
+
+---
+
+## [2.2.2] — 2026-05-19
+
+### Added / 新增
+
+- Options page footer: author info and link to GitHub repository
+
+### 新增（中文）
+
+- 设置页页脚：作者信息与 GitHub 开源仓库链接
+
+---
+
+## [2.2.1] — 2026-05-19
+
+### Added / 新增
+
+- Backup: export/import shortcuts and settings as JSON (for uninstall, reinstall, Edge store)
+
+### 新增（中文）
+
+- 备份与恢复：导出/导入 JSON（卸载、重装、Edge 商店安装后恢复配置）
+
+---
+
+## [2.2.0] — 2026-05-19
+
+### Added / 新增
+
+- Appearance theme: follow system, light, or dark (options + side panel)
+
+### 新增（中文）
+
+- 外观主题：跟随系统 / 浅色 / 深色（设置页与侧栏同步）
+
+---
+
+## [2.1.9] — 2026-05-19
+
+### Changed / 变更
+
+- Removed global “default mobile mode”; new shortcuts default to mobile; per-shortcut mobile/desktop only
+
+### 变更（中文）
+
+- 移除全局「默认移动版」开关；新建入口默认移动版；仅在编辑单条时选择移动版/桌面版
+
+---
+
 ## [2.1.8] — 2026-05-19
 
 ### Fixed / 修复

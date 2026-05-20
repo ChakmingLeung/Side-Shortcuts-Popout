@@ -63,14 +63,13 @@
 
 ```json
 {
-  "settings": { "defaultMobileMode": true },
+  "settings": { "locale": null },
   "shortcuts": [
     {
       "id": "uuid",
       "title": "抖音",
       "url": "https://www.douyin.com/jingxuan",
-      "emoji": "🎵",
-      "mobile": null
+      "mobile": true
     }
   ]
 }
@@ -95,7 +94,7 @@
 
 ### v1.0.0
 
-- 侧边栏、快捷入口、标签切换、sync
+- 侧边栏、快捷入口、JSON 导入导出备份、sync
 
 ---
 

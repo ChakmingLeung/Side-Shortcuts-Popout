@@ -76,14 +76,13 @@ Microsoft is simplifying Edge and [retiring the sidebar App Tower](https://suppo
 
 ```json
 {
-  "settings": { "defaultMobileMode": true },
+  "settings": { "locale": null },
   "shortcuts": [
     {
       "id": "uuid",
       "title": "Douyin",
       "url": "https://www.douyin.com/jingxuan",
-      "emoji": "🎵",
-      "mobile": null
+      "mobile": true
     }
   ],
   "lastShortcutId": "uuid"
@@ -109,7 +108,7 @@ Microsoft is simplifying Edge and [retiring the sidebar App Tower](https://suppo
 
 ### v1.0.0
 
-- Side panel, shortcuts, tab bar, sync
+- Side panel, shortcuts, JSON backup import/export, sync
 
 ### Backlog
 

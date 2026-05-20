@@ -58,7 +58,7 @@ flowchart TD
 | Key | 说明 |
 |-----|------|
 | `shortcuts` | 用户入口（`url` 为原始地址） |
-| `settings.defaultMobileMode` | 全局默认移动版 |
+| `shortcut.mobile` | `true` / 省略 / `null` → 移动版；`false` → 桌面版 |
 | `settings.locale` | `null` 跟随浏览器；`zh` / `en` |
 | `lastShortcutId` | 上次点击的入口（高亮） |
 
