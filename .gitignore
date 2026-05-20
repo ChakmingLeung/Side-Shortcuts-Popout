@@ -23,6 +23,9 @@ npm-debug.log*
 # Local-only GitHub About / Release copy (not published)
 .github/DESCRIPTION.md
 
+# Edge store assets (screenshots, promo tiles, certification notes — local only)
+for store/
+
 # Packaged extension artifacts
 dist/
 *.zip
