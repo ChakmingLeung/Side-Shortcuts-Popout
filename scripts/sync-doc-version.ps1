@@ -22,7 +22,8 @@ $files = @(
   "docs\PRD.zh-CN.md",
   "docs\ARCHITECTURE.md",
   "docs\ARCHITECTURE.zh-CN.md",
-  "docs\README.md"
+  "docs\README.md",
+  ".github\DESCRIPTION.md"
 )
 
 $badgePattern = 'version-\d+\.\d+\.\d+-blue'
@@ -50,6 +51,9 @@ foreach ($rel in $files) {
   $content = [regex]::Replace($content, 'Latest: \*\*v\d+\.\d+\.\d+\*\*', "Latest: **v$version**")
   $content = [regex]::Replace($content, '\| 产品版本 \| \d+\.\d+\.\d+ \|', "| 产品版本 | $version |")
   $content = [regex]::Replace($content, '\| 文档版本 \| v\d+\.\d+\.\d+ \|', "| 文档版本 | v$version |")
+  $content = [regex]::Replace($content, [regex]::Escape('当前版本：**') + '\d+\.\d+\.\d+', "当前版本：**$version**")
+  $content = [regex]::Replace($content, 'Side-Shortcuts-Popout-v\d+\.\d+\.\d+\.zip', "Side-Shortcuts-Popout-v$version.zip")
+  $content = [regex]::Replace($content, '\`v\d+\.\d+\.\d+\s*[\u2014-]', ('`v{0} -' -f $version))
 
   if ($content -ne $original) {
     [System.IO.File]::WriteAllText($file, $content, [System.Text.UTF8Encoding]::new($false))

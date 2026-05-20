@@ -13,12 +13,14 @@ All notable changes to this project are documented here. Version numbers match `
 - Options layout: add/edit left, saved list right; inline edit in list; import/export on list header
 - Import panel: merge/replace only; close via top-right icon
 - Author info and version moved to options page title row (right)
+- Docs: README, PRD, ARCHITECTURE, MAINTENANCE, `.github/DESCRIPTION.md` synced for v2.2.x
 
 ### 变更（中文）
 
 - 设置页左右分栏、列表内联编辑；导入/导出移至「已保存的入口」标题栏
 - 导入面板仅保留合并/替换，右上角关闭图标
 - 作者信息与版本号移至页面标题行右侧
+- 文档：同步 README、PRD、ARCHITECTURE、MAINTENANCE、GitHub 仓库文案
 
 ---
 

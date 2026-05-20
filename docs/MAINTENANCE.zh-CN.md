@@ -20,8 +20,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\pack-extension.ps1
 
 # 推送到 GitHub 并自动发 Release（需先提交并打 tag）
-git tag v2.1.5
-git push origin v2.1.5
+git tag v2.2.3
+git push origin v2.2.3
 ```
 
 推送 `v*` 标签后，GitHub Actions（`.github/workflows/release.yml`）会自动上传 zip 到 [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)。
@@ -48,7 +48,10 @@ git push origin v2.1.5
 |----------|----------------|
 | `manifest.json` 权限 | README 环境要求、ARCHITECTURE 权限、CHANGELOG |
 | `shared.js` 移动版白名单 | ARCHITECTURE、README 移动版说明、PRD、CHANGELOG |
-| `sidepanel` / `options` 界面 | README 功能说明、PRD、截图说明 |
+| `sidepanel` / `options` 界面 | README、PRD、ARCHITECTURE、截图说明 |
+| `theme.js` / 主题 | README、ARCHITECTURE、PRD、CHANGELOG |
+| `backup.js` / 导入导出 | README、PRD、ARCHITECTURE、CHANGELOG |
+| `.github/DESCRIPTION.md` | 发版时更新版本与 Release 模板 |
 | 仅 Bug 修复 | CHANGELOG + 版本号 |
 
 ## 提交信息建议

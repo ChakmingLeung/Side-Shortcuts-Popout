@@ -43,7 +43,10 @@ Project rule `.cursor/rules/github-docs-sync.mdc` is **always on**. When you ask
 |-------------|---------------|
 | New permission in `manifest.json` | README (Requirements), ARCHITECTURE (Permissions), CHANGELOG |
 | `shared.js` mobile allowlist | ARCHITECTURE, README (Mobile), PRD (§5.1), CHANGELOG |
-| UI in `sidepanel` / `options` | README (Features), PRD, screenshots note |
+| UI in `sidepanel` / `options` | README, PRD, ARCHITECTURE, screenshots note |
+| `theme.js` / appearance | README, ARCHITECTURE, PRD, CHANGELOG |
+| `backup.js` / import-export | README, PRD, ARCHITECTURE, CHANGELOG |
+| `.github/DESCRIPTION.md` | Version and Release template on ship |
 | Bug fix only | CHANGELOG + version bump |
 
 ## Git commit suggestion

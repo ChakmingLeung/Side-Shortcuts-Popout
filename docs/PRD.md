@@ -6,8 +6,8 @@
 
 | Attribute | Value |
 |-----------|-------|
-| Doc version | v2.1.7 |
-| Product version | 2.1.7 |
+| Doc version | v2.2.3 |
+| Product version | 2.2.3 |
 | Last updated | 2026-05-19 |
 | Status | Open source |
 | Platforms | Microsoft Edge 114+, Google Chrome 114+ |
@@ -24,24 +24,24 @@ Microsoft is simplifying Edge and [retiring the sidebar App Tower](https://suppo
 
 | Pain | Description |
 |------|-------------|
-| Broken habits | Users relied on Edge sidebar for Outlook, Teams, IM, etc. |
-| iframe / login | Embedded side panel ≠ tab cookies; some sites block framing |
-| **Broken URLs (v1.1.0)** | Generic `www`→`m` rewrite made saved shortcuts unreachable (fixed) |
+| Broken habits | Users relied on Edge sidebar for quick site access |
+| iframe / login | Embedded side panel ≠ tab cookies; some sites block framing (iframe removed in v2.0) |
+| **Broken URLs (v1.1.0)** | Generic `www`→`m` rewrite (fixed) |
+| Data loss on uninstall | Extension storage is cleared on uninstall; JSON backup is user-driven |
 
 ### 1.3 Opportunity
 
-**Side Panel shortcut list** + **popout (top-level browsing)** + **allowlisted mobile mapping**—without mutating stored URLs.
+**Side Panel shortcut list** + **popout browsing** + **allowlisted mobile mapping** + **theme / backup / inline edit**—without mutating stored URLs.
 
 ---
 
 ## 2. Product goals
 
-### 2.1 Goals
-
-1. User-defined shortcuts; **stored `url` is always user input**
-2. Vertical shortcut list in side panel; click opens popout window
-3. Mobile mode: allowlist hostname transform; non-allowlist = original URL in popout
-4. Sync via `chrome.storage.sync`; no server, no telemetry
+1. Stored `shortcuts[].url` is always user input
+2. Vertical list in side panel; click opens popout
+3. New shortcuts default to mobile; per-entry mobile/desktop
+4. Local persistence + optional `chrome.storage.sync`; JSON import/export
+5. No server, no telemetry
 
 ### 2.2 Non-goals
 
@@ -53,30 +53,32 @@ Microsoft is simplifying Edge and [retiring the sidebar App Tower](https://suppo
 
 | ID | Story | Acceptance criteria |
 |----|-------|---------------------|
-| US-02 | Open from sidebar | Popout window with resolved URL |
-| US-03 | Multiple shortcuts | One popout per shortcut; refocus if already open |
+| US-02 | Open from sidebar | Popout with resolved URL |
 | US-07 | Mobile allowlist | Bilibili/Weibo use `m.` host in popout; saved URL unchanged |
-| US-08 | Outlook/Teams work | No automatic `m.` rewrite; original URL loads |
-| US-09 | Options display | List shows saved URL; optional “sidebar load” hint |
+| US-08 | Other sites | Non-allowlist keeps saved URL |
+| US-10 | Inline edit | Edit expands in the saved list without scrolling to the add form |
+| US-11 | Backup | Export JSON; import after reinstall (merge/replace) |
+| US-12 | Theme | System / light / dark in options; side panel follows |
 
 ---
 
 ## 5. Functional requirements
 
-### 5.1 Mobile mode rules (v1.1.1)
+### 5.1 Mobile mode rules
 
 | Rule | Behavior |
 |------|----------|
-| Storage | `shortcuts[].url` = user-configured canonical URL only |
-| Allowlist | `HOST_TO_MOBILE` in `shared.js` (Douyin, Bilibili, Weibo, …) |
-| Non-allowlist | `loadUrl === canonicalUrl`; mobile UA via DNR on **load hostname** |
+| Storage | `shortcuts[].url` = user canonical URL only |
+| Default | New entries `mobile: true`; `mobile === false` = desktop |
+| Allowlist | `HOST_TO_MOBILE` in `shared.js` (Bilibili, Weibo) |
+| Non-allowlist | `loadUrl === canonicalUrl` (v2 popout: no DNR / UA injection) |
 | No generic `www`→`m` | Removed in v1.1.1 |
 
 ### 5.2 Data model
 
 ```json
 {
-  "settings": { "locale": null },
+  "settings": { "locale": null, "theme": "system" },
   "shortcuts": [
     {
       "id": "uuid",
@@ -91,28 +93,33 @@ Microsoft is simplifying Edge and [retiring the sidebar App Tower](https://suppo
 
 `resolveLoadUrl()` returns `{ loadUrl, canonicalUrl, mobile, urlTransformed }`.
 
+### 5.3 Backup format
+
+- Export: JSON via `backup.js` (shortcuts, settings, version, timestamp)
+- Import: merge (update by id, append new) or replace (clear then import)
+- UI: **Saved shortcuts** header; choose mode before file picker
+
+### 5.4 Options & side panel
+
+- Global: language, appearance theme
+- Two-column options: add (left), list (right); responsive stack
+- Header right: author, GitHub link, extension version
+- Side panel: favicons, settings link, list refresh on storage changes
+
 ---
 
-## 8. Roadmap
+## 8. Roadmap (summary)
 
-### v1.1.1 (current)
+| Version | Highlights |
+|---------|------------|
+| **v2.2.3** (current) | Options layout, inline edit, import/export UX, header author info |
+| v2.2.1 | JSON backup import/export |
+| v2.2.0 | Appearance theme |
+| v2.1.9 | Removed global mobile toggle; new shortcuts default mobile |
+| v2.1.8 | `favicon` permission and icon fallbacks |
+| v2.0.0 | Dropped iframe; popout on click |
 
-- Fix mobile URL overwrite bug
-- Allowlist-only domain mapping
-- Hostname-scoped DNR
-- Options UI shows canonical URL
-
-### v1.1.0
-
-- Mobile WAP mode, DNR UA, per-shortcut toggles
-
-### v1.0.0
-
-- Side panel, shortcuts, JSON backup import/export, sync
-
-### Backlog
-
-v1.2 drag sort / JSON export · v2.0 store publish
+See [CHANGELOG.md](../CHANGELOG.md).
 
 ---
 
@@ -120,4 +127,4 @@ v1.2 drag sort / JSON export · v2.0 store publish
 
 - [Edge App Tower retirement](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge)
 - [chrome.sidePanel](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
-- [declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)
+- [Fetching favicons](https://developer.chrome.com/docs/extensions/how-to/ui/favicons)
