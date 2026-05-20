@@ -132,32 +132,74 @@ export async function saveSettings(settings) {
 
 const DEFAULT_FAVICON_FALLBACK = "🔗";
 
-/** 站点 favicon（优先 Chrome 内置缓存，回退 Google 公共服务） */
-export function getFaviconUrl(urlString, size = 32) {
+/**
+ * 与书签栏一致：优先 Chrome 已缓存的站点图标（需 manifest 中 favicon 权限），再尝试常见回退源。
+ * @returns {string[]}
+ */
+export function getFaviconCandidateUrls(urlString, size = 32) {
   const pageUrl = normalizeUrl(urlString);
-  if (!pageUrl) return null;
+  if (!pageUrl) return [];
+
+  const urls = [];
 
   try {
     if (typeof chrome !== "undefined" && chrome.runtime?.getURL) {
       const favicon = new URL(chrome.runtime.getURL("/_favicon/"));
       favicon.searchParams.set("pageUrl", pageUrl);
       favicon.searchParams.set("size", String(size));
-      return favicon.toString();
+      urls.push(favicon.toString());
     }
   } catch {
-    /* fall through */
+    /* */
   }
 
   try {
-    const host = new URL(pageUrl).hostname;
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=${size}`;
+    const u = new URL(pageUrl);
+    urls.push(`${u.origin}/favicon.ico`);
+    urls.push(
+      `https://www.google.com/s2/favicons?domain=${encodeURIComponent(u.hostname)}&sz=${size}`
+    );
+    urls.push(`https://icons.duckduckgo.com/ip3/${u.hostname}.ico`);
   } catch {
-    return null;
+    /* */
   }
+
+  return [...new Set(urls)];
+}
+
+/** @returns {string | null} 首选 favicon URL */
+export function getFaviconUrl(urlString, size = 32) {
+  const candidates = getFaviconCandidateUrls(urlString, size);
+  return candidates[0] ?? null;
+}
+
+function tryLoadFaviconImage(wrap, className, size, candidates, index = 0) {
+  if (index >= candidates.length) {
+    appendFaviconFallback(wrap, className);
+    return;
+  }
+
+  const img = document.createElement("img");
+  img.className = className;
+  img.width = size;
+  img.height = size;
+  img.alt = "";
+  img.decoding = "async";
+  img.referrerPolicy = "no-referrer";
+  img.src = candidates[index];
+  img.addEventListener(
+    "error",
+    () => {
+      img.remove();
+      tryLoadFaviconImage(wrap, className, size, candidates, index + 1);
+    },
+    { once: true }
+  );
+  wrap.append(img);
 }
 
 /**
- * 根据网址创建图标节点（img + 加载失败时显示默认符号）
+ * 根据网址创建图标节点（img + 多级回退，效果接近浏览器书签）
  * @param {string} url
  * @param {{ size?: number, className?: string }} [opts]
  */
@@ -165,25 +207,9 @@ export function createShortcutIcon(url, { size = 22, className = "shortcut-icon"
   const wrap = document.createElement("span");
   wrap.className = `${className}-wrap`;
 
-  const src = getFaviconUrl(url, 32);
-  if (src) {
-    const img = document.createElement("img");
-    img.className = className;
-    img.width = size;
-    img.height = size;
-    img.alt = "";
-    img.decoding = "async";
-    img.referrerPolicy = "no-referrer";
-    img.src = src;
-    img.addEventListener(
-      "error",
-      () => {
-        img.remove();
-        appendFaviconFallback(wrap, className);
-      },
-      { once: true }
-    );
-    wrap.append(img);
+  const candidates = getFaviconCandidateUrls(url, 32);
+  if (candidates.length > 0) {
+    tryLoadFaviconImage(wrap, className, size, candidates);
   } else {
     appendFaviconFallback(wrap, className);
   }

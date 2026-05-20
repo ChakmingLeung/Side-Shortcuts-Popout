@@ -6,6 +6,18 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.1.8] — 2026-05-19
+
+### Fixed / 修复
+
+- Shortcut icons: add `favicon` permission so Chrome `/_favicon/` works like the bookmark bar; chain fallbacks on load failure
+
+### 修复（中文）
+
+- 快捷方式图标：声明 `favicon` 权限，使用与书签栏相同的 Chrome 站点图标缓存；加载失败时依次回退
+
+---
+
 ## [2.1.7] — 2026-05-19
 
 ### Added / 新增
