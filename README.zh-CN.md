@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.7-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.3-blue.svg)](CHANGELOG.md)
 
 **仓库地址：** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -37,14 +37,17 @@
 
 | 能力 | 说明 |
 |------|------|
-| 可配置快捷入口 | 自定义名称、URL；图标自动取自网站 favicon |
+| 可配置快捷入口 | 自定义名称、URL；图标自动取自网站 favicon（与书签栏同源缓存） |
 | 小窗打开 | 点击快捷入口在独立小窗打开（可并存多个） |
 | 摸鱼友好 | 主窗口照常办公/学习，侧栏一键开小窗刷小红书、抖音、Ins 等；小窗关了就收，不占主标签 |
 | 低调并排 | 侧栏只占一条窄列，不像全屏切站那么显眼；需要时焦点切回主窗口即可 |
 | 移动版 (WAP) | 新建默认移动版；B 站、微博等白名单转 `m.` 域名；其余使用保存的 URL |
+| 外观主题 | 设置页可选跟随系统 / 浅色 / 深色（侧栏同步） |
+| 备份与恢复 | 「已保存的入口」标题栏可导出/导入 JSON，卸载或重装后恢复配置 |
+| 设置页布局 | 左侧添加入口，右侧列表；列表内 **编辑** 就地展开，无需滚回表单 |
 | 纵向列表 | 侧栏仅展示快捷入口，无 iframe 内嵌 |
 | 地址不被篡改 | 存储的配置 URL 始终为用户填写的原始地址（v1.1.1+） |
-| 配置同步 | 使用 `chrome.storage.sync`，同账号多设备可同步 |
+| 配置同步 | 使用 `chrome.storage.sync`，同账号多设备可同步（未卸载时） |
 | 界面语言 | 侧边栏与设置页支持简体中文 / English / 跟随浏览器 |
 | 隐私友好 | 不采集、不上传浏览数据 |
 
@@ -57,7 +60,7 @@
 ## 环境要求
 
 - **Microsoft Edge 114+** 或 **Google Chrome 114+**
-- 权限：`storage`、`sidePanel`
+- 权限：`storage`、`sidePanel`、`favicon`（读取站点图标，与书签栏一致）
 
 ## 快速安装
 
@@ -92,7 +95,7 @@
 1. **固定到工具栏（Pin to toolbar）：** 扩展图标（拼图）→ **侧栏快捷小窗** → 图钉固定，便于随时打开侧栏  
 2. 预置语雀、小红书、抖音、Instagram、TikTok 示例，可在设置中修改  
 3. 打开侧栏，点击入口即可在小窗打开  
-4. 需增删改入口：侧栏右上角 **齿轮** 或扩展 **选项** 页
+4. 需增删改入口：侧栏右上角 **齿轮** 或扩展 **选项** 页；在列表中点 **编辑** 可就地修改，无需滚回左侧表单
 
 ## 快捷方式会丢失吗？数据存在哪？
 
@@ -113,7 +116,7 @@
 **建议：**
 
 - 日常：登录 Chrome / Edge 并开启同步，可在多设备间同步（未卸载时有效）
-- 卸载、换电脑或从 **Edge 加载项商店** 重装前：在扩展 **选项 → 备份与恢复** 中 **导出 JSON**，重装后 **导入** 即可恢复快捷入口
+- 卸载、换电脑或从 **Edge 加载项商店** 重装前：在选项页 **「已保存的入口」** 右侧 **导出配置**，重装后 **导入配置**（先选合并或替换，再选 JSON 文件）即可恢复
 - 开发时尽量用「重新加载」，不要删除后重新「加载已解压的扩展程序」
 
 ## 移动版 (WAP) 说明
@@ -130,9 +133,12 @@
 Side-Shortcuts-Popout/
 ├── manifest.json
 ├── background.js
+├── shared.js
+├── theme.js
+├── backup.js
+├── i18n.js
 ├── sidepanel.html/js/css
 ├── options.html/js/css
-├── shared.js
 ├── icons/
 ├── scripts/
 └── docs/
@@ -156,7 +162,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 
 ## 更新日志
 
-见 [CHANGELOG.md](CHANGELOG.md)。当前最新：**v2.0.0** — 侧栏为快捷列表，点击默认小窗打开。
+见 [CHANGELOG.md](CHANGELOG.md)。当前最新：**v2.2.3** — 主题与备份、设置页左右分栏与列表内联编辑、站点 favicon、导入/导出入口优化等。
 
 ## 已知限制
 

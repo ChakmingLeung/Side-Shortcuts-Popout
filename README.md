@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.1.7-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.3-blue.svg)](CHANGELOG.md)
 
 **Repository:** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -37,14 +37,17 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 
 | Feature | Description |
 |---------|-------------|
-| Custom shortcuts | Name and URL; favicon loaded automatically from each site |
+| Custom shortcuts | Name and URL; favicon from each site (Chrome bookmark-style cache) |
 | Popout on click | Each shortcut opens in a dedicated popout window |
 | Break-time friendly | Keep work in the main window; pop out Xiaohongshu, Douyin, Instagram, etc. beside you—close the small window when done |
 | Low-profile layout | Narrow side panel launcher—less obvious than switching full tabs; focus the main window anytime |
 | Mobile (WAP) by default | Allowlisted `m.` mapping (Bilibili, Weibo); others use saved URL |
+| Appearance | System / light / dark theme (options + side panel) |
+| Backup & restore | Export/import JSON from the **Saved shortcuts** header (for uninstall or reinstall) |
+| Options layout | Add form on the left, list on the right; **Edit** expands inline in the list |
 | Vertical list | Side panel is a launcher only—no iframe embedding |
 | Saved URL integrity | Configured URLs are never rewritten in storage (v1.1.1+) |
-| Sync | `chrome.storage.sync` across signed-in devices |
+| Sync | `chrome.storage.sync` across signed-in devices (while extension stays installed) |
 | UI language | Simplified Chinese / English / follow browser (side panel + options) |
 | Privacy-first | No analytics; config stored locally / in sync only |
 
@@ -57,7 +60,7 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 ## Requirements
 
 - **Microsoft Edge 114+** or **Google Chrome 114+** (Side Panel API)
-- Permissions: `storage`, `sidePanel`
+- Permissions: `storage`, `sidePanel`, `favicon` (site icons, same source as the bookmark bar)
 
 ## Quick start
 
@@ -92,7 +95,7 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 1. **Pin to toolbar:** Extensions menu (puzzle) → **Side Shortcuts Popout** → Pin, so you can open the side panel anytime  
 2. Sample shortcuts (Yuque, Xiaohongshu, Douyin, Instagram, TikTok) are pre-installed—edit or remove them in options  
 3. Open the side panel and click a shortcut to open its popout  
-4. Manage shortcuts via the **gear** icon in the side panel or **Extension options**
+4. Manage shortcuts via the **gear** icon in the side panel or **Extension options**; use **Edit** on a list row to change it in place
 
 ## Will I lose my shortcuts?
 
@@ -111,7 +114,7 @@ Early releases (v1.x) embedded target sites in an **iframe** inside the side pan
 **Tips:**
 
 - Stay signed in with sync for multi-device use while the extension remains installed
-- Before uninstall, device change, or reinstall from the **Edge Add-ons store**: **Options → Backup & restore** → export JSON, then import after reinstall
+- Before uninstall, device change, or reinstall from the **Edge Add-ons store**: on the options page, **Export** from the **Saved shortcuts** header, then **Import** after reinstall (choose merge or replace, then pick the JSON file)
 - When developing, use **Reload** instead of removing and re-adding the unpacked extension
 
 ## Mobile (WAP) mode
@@ -128,9 +131,12 @@ New shortcuts **default to mobile**; each entry can be set to desktop in the edi
 Side-Shortcuts-Popout/
 ├── manifest.json
 ├── background.js
+├── shared.js
+├── theme.js
+├── backup.js
+├── i18n.js
 ├── sidepanel.html/js/css
 ├── options.html/js/css
-├── shared.js
 ├── icons/
 ├── scripts/
 └── docs/
@@ -154,7 +160,7 @@ After code changes, click **Reload** on the extensions page.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.1.7** — vertical shortcut list; click opens popout.
+See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.2.3** — theme & backup, options layout with inline edit, favicons, import/export UX.
 
 ## Known limitations
 
