@@ -8,6 +8,7 @@ import {
   toMobileUrl,
   shouldUseMobile,
   createShortcutIcon,
+  GITHUB_AUTHOR_URL,
   GITHUB_REPO_URL,
 } from "./shared.js";
 import {
@@ -449,6 +450,9 @@ chrome.storage.onChanged.addListener(async (changes) => {
 });
 
 function applyAuthorFooter() {
+  document.querySelectorAll("[data-author-link]").forEach((el) => {
+    el.href = GITHUB_AUTHOR_URL;
+  });
   document.querySelectorAll("[data-repo-link]").forEach((el) => {
     el.href = GITHUB_REPO_URL;
   });

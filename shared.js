@@ -4,7 +4,10 @@ const LAST_KEY = "lastShortcutId";
 
 const SETTINGS_KEY = "settings";
 
-/** 开源仓库（设置页作者信息、引流） */
+/** 作者 GitHub 主页（设置页「作者」链接） */
+export const GITHUB_AUTHOR_URL = "https://github.com/ChakmingLeung";
+
+/** 开源仓库（设置页仓库 CTA） */
 export const GITHUB_REPO_URL =
   "https://github.com/ChakmingLeung/Side-Shortcuts-Popout";
 
