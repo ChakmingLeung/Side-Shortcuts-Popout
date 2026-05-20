@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.2.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.4-blue.svg)](CHANGELOG.md)
 
 **Repository:** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -159,7 +159,7 @@ After code changes, click **Reload** on the extensions page.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.2.3** — theme & backup, options layout with inline edit, favicons, import/export UX.
+See [CHANGELOG.md](CHANGELOG.md) for release notes. Latest: **v2.2.4** — theme & backup, options layout with inline edit, favicons, import/export UX.
 
 ## Known limitations
 

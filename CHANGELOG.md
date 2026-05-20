@@ -6,6 +6,30 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.2.4] — 2026-05-19
+
+### Fixed / 修复
+
+- Options: author name link opens GitHub profile; repository CTA unchanged
+
+### Changed / 变更
+
+- Code cleanup: remove unused left-form edit path, dead exports, duplicate list refresh
+- Shared `escapeHtml`; slimmer favicon fallback chain (extension cache + site `/favicon.ico`)
+- List rendering uses `DocumentFragment`; default install shortcuts moved to `shared.js`
+
+### 修复（中文）
+
+- 设置页作者「ChakmingLeung」跳转 GitHub 个人主页；仓库链接不变
+
+### 变更（中文）
+
+- 精简代码：移除左侧表单遗留编辑逻辑、未使用 API、重复刷新
+- 合并 `escapeHtml`；favicon 仅保留扩展缓存与站点 `/favicon.ico` 回退
+- 列表渲染优化；首次安装示例数据集中到 `shared.js`
+
+---
+
 ## [2.2.3] — 2026-05-19
 
 ### Changed / 变更

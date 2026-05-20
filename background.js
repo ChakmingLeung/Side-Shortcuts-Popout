@@ -1,5 +1,6 @@
 import {
   DEFAULT_SETTINGS,
+  DEFAULT_INSTALL_SHORTCUTS,
   getShortcuts,
   saveShortcuts,
   hasStoredSettings,
@@ -39,37 +40,13 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   }
 
   if (!(await getShortcuts()).length) {
-    await saveShortcuts([
-      {
+    await saveShortcuts(
+      DEFAULT_INSTALL_SHORTCUTS.map((item) => ({
         id: crypto.randomUUID(),
-        title: "语雀",
-        url: "https://www.yuque.com/",
+        title: item.title,
+        url: item.url,
         mobile: true,
-      },
-      {
-        id: crypto.randomUUID(),
-        title: "小红书",
-        url: "https://www.xiaohongshu.com/explore",
-        mobile: true,
-      },
-      {
-        id: crypto.randomUUID(),
-        title: "抖音",
-        url: "https://www.douyin.com/jingxuan",
-        mobile: true,
-      },
-      {
-        id: crypto.randomUUID(),
-        title: "Instagram",
-        url: "https://www.instagram.com/",
-        mobile: true,
-      },
-      {
-        id: crypto.randomUUID(),
-        title: "TikTok",
-        url: "https://www.tiktok.com/",
-        mobile: true,
-      },
-    ]);
+      }))
+    );
   }
 });

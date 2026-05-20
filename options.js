@@ -1,4 +1,4 @@
-import {
+﻿import {
   getShortcuts,
   saveShortcuts,
   getSettings,
@@ -8,6 +8,7 @@ import {
   toMobileUrl,
   shouldUseMobile,
   createShortcutIcon,
+  escapeHtml,
   GITHUB_AUTHOR_URL,
   GITHUB_REPO_URL,
 } from "./shared.js";
@@ -28,14 +29,12 @@ import {
 
 const form = document.getElementById("shortcut-form");
 const formTitle = document.getElementById("form-title");
-const editId = document.getElementById("edit-id");
 const titleInput = document.getElementById("title");
 const urlInput = document.getElementById("url");
 const mobileModeSelect = document.getElementById("mobile-mode");
 const languageSelect = document.getElementById("language");
 const themeSelect = document.getElementById("theme");
 const formError = document.getElementById("form-error");
-const btnCancel = document.getElementById("btn-cancel");
 const manageList = document.getElementById("manage-list");
 const manageEmpty = document.getElementById("manage-empty");
 const btnExportBackup = document.getElementById("btn-export-backup");
@@ -46,7 +45,7 @@ const importReplaceBtn = document.getElementById("import-replace");
 const importPanelCloseBtn = document.getElementById("import-panel-close");
 const importBackupFile = document.getElementById("import-backup-file");
 const backupStatus = document.getElementById("backup-status");
-/** @type {string | null} 右侧列表内联编辑中的快捷方式 id */
+/** @type {string | null} 鍙充晶鍒楄〃鍐呰仈缂栬緫涓殑蹇嵎鏂瑰紡 id */
 let editingInlineId = null;
 /** @type {"merge" | "replace" | null} */
 let pendingImportMode = null;
@@ -70,19 +69,13 @@ function applyOptionsI18n() {
     importPanelCloseBtn.title = label;
     importPanelCloseBtn.setAttribute("aria-label", label);
   }
-  if (!editId.value) {
-    formTitle.dataset.i18n = "addShortcut";
-    formTitle.textContent = t("addShortcut");
-  }
+  formTitle.dataset.i18n = "addShortcut";
+  formTitle.textContent = t("addShortcut");
 }
 
 function resetForm() {
-  editId.value = "";
   form.reset();
   mobileModeSelect.value = "on";
-  formTitle.dataset.i18n = "addShortcut";
-  formTitle.textContent = t("addShortcut");
-  btnCancel.hidden = true;
   formError.hidden = true;
 }
 
@@ -220,11 +213,11 @@ function openInlineEdit(item) {
 }
 
 async function renderManageList(shortcuts) {
-  manageList.replaceChildren();
+  const fragment = document.createDocumentFragment();
   manageEmpty.hidden = shortcuts.length > 0;
   for (const item of shortcuts) {
     if (item.id === editingInlineId) {
-      manageList.append(buildInlineEditItem(item));
+      fragment.append(buildInlineEditItem(item));
       continue;
     }
 
@@ -258,23 +251,15 @@ async function renderManageList(shortcuts) {
     li.querySelector(".btn-delete").addEventListener("click", () =>
       removeShortcut(item.id)
     );
-    manageList.appendChild(li);
+    fragment.appendChild(li);
   }
-}
-
-function escapeHtml(str) {
-  return str
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
+  manageList.replaceChildren(fragment);
 }
 
 async function removeShortcut(id) {
   const shortcuts = await getShortcuts();
   await saveShortcuts(shortcuts.filter((s) => s.id !== id));
   await refresh();
-  if (editId.value === id) resetForm();
   if (editingInlineId === id) editingInlineId = null;
 }
 
@@ -298,7 +283,6 @@ languageSelect.addEventListener("change", async () => {
   applyOptionsI18n();
   applyAuthorFooter();
   await refresh();
-  if (editingInlineId) await refresh();
 });
 
 form.addEventListener("submit", async (e) => {
@@ -321,23 +305,12 @@ form.addEventListener("submit", async (e) => {
   }
 
   const shortcuts = await getShortcuts();
-  const existingId = editId.value;
-
-  if (existingId) {
-    const idx = shortcuts.findIndex((s) => s.id === existingId);
-    if (idx >= 0) {
-      shortcuts[idx] = { ...shortcuts[idx], title, url, mobile };
-    }
-  } else {
-    shortcuts.push({ id: newId(), title, url, mobile });
-  }
+  shortcuts.push({ id: newId(), title, url, mobile });
 
   await saveShortcuts(shortcuts);
   resetForm();
   await refresh();
 });
-
-btnCancel.addEventListener("click", resetForm);
 
 function showBackupStatus(message, isError = false) {
   if (!backupStatus) return;

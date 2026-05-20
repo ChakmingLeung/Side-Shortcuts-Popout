@@ -6,7 +6,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.2.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.4-blue.svg)](CHANGELOG.md)
 
 **仓库地址：** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
@@ -161,7 +161,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 
 ## 更新日志
 
-见 [CHANGELOG.md](CHANGELOG.md)。当前最新：**v2.2.3** — 主题与备份、设置页左右分栏与列表内联编辑、站点 favicon、导入/导出入口优化等。
+见 [CHANGELOG.md](CHANGELOG.md)。当前最新：**v2.2.4** — 作者主页链接、代码精简与 favicon 回退优化等。
 
 ## 已知限制
 

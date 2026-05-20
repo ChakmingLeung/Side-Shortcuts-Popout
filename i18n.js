@@ -5,8 +5,6 @@ export const SUPPORTED_LOCALES = ["zh", "en"];
 /** @type {"zh" | "en"} */
 let currentLocale = "zh";
 
-const listeners = new Set();
-
 const MESSAGES = {
   zh: {
     docTitleOptions: "侧栏快捷小窗 - 设置",
@@ -43,7 +41,6 @@ const MESSAGES = {
     authorRepoCta: "GitHub 开源仓库 · 反馈与 Star",
     authorVersion: "版本 {version}",
     addShortcut: "添加快捷入口",
-    editShortcut: "编辑快捷入口",
     fieldName: "名称",
     fieldUrl: "网址",
     fieldFaviconHint: "图标将根据网址自动显示网站 favicon，无需配置。",
@@ -55,13 +52,13 @@ const MESSAGES = {
     placeholderTitle: "例如：语雀",
     placeholderUrl: "https://example.com",
     btnSave: "保存",
-    btnCancel: "取消编辑",
+    btnCancel: "取消",
     savedShortcuts: "已保存的入口",
     manageEmpty: "暂无快捷入口",
     mobileBadge: "移动版",
     desktopBadge: "桌面版",
     manageLoadMapped: "小窗打开：{url}",
-    manageLoadUa: "小窗：原地址（无移动域名映射）",
+    manageLoadUa: "小窗：按保存的网址打开",
     btnEdit: "编辑",
     btnDelete: "删除",
     errNameRequired: "请填写名称",
@@ -111,7 +108,6 @@ const MESSAGES = {
     authorRepoCta: "GitHub repo · feedback & Star",
     authorVersion: "Version {version}",
     addShortcut: "Add shortcut",
-    editShortcut: "Edit shortcut",
     fieldName: "Name",
     fieldUrl: "URL",
     fieldFaviconHint: "Icons use each site’s favicon from the URL automatically.",
@@ -123,13 +119,13 @@ const MESSAGES = {
     placeholderTitle: "e.g. Yuque",
     placeholderUrl: "https://example.com",
     btnSave: "Save",
-    btnCancel: "Cancel edit",
+    btnCancel: "Cancel",
     savedShortcuts: "Saved shortcuts",
     manageEmpty: "No shortcuts yet",
     mobileBadge: "Mobile",
     desktopBadge: "Desktop",
     manageLoadMapped: "Popout opens: {url}",
-    manageLoadUa: "Popout: original URL (no mobile host mapping)",
+    manageLoadUa: "Popout: opens saved URL",
     btnEdit: "Edit",
     btnDelete: "Delete",
     errNameRequired: "Please enter a name",
@@ -165,15 +161,6 @@ export function t(key, vars = {}) {
   return str;
 }
 
-export function onLocaleChange(fn) {
-  listeners.add(fn);
-  return () => listeners.delete(fn);
-}
-
-function notifyLocaleChange() {
-  for (const fn of listeners) fn(currentLocale);
-}
-
 export async function initI18n() {
   const settings = await getSettings();
   currentLocale = resolveLocale(settings);
@@ -186,7 +173,6 @@ export async function setLocalePreference(preference) {
     preference === "zh" || preference === "en" ? preference : null;
   await saveSettings(settings);
   currentLocale = resolveLocale(settings);
-  notifyLocaleChange();
   try {
     await chrome.runtime.sendMessage({
       type: "SET_ACTION_TITLE",

@@ -1,7 +1,5 @@
 const STORAGE_KEY = "shortcuts";
-
 const LAST_KEY = "lastShortcutId";
-
 const SETTINGS_KEY = "settings";
 
 /** 作者 GitHub 主页（设置页「作者」链接） */
@@ -11,8 +9,6 @@ export const GITHUB_AUTHOR_URL = "https://github.com/ChakmingLeung";
 export const GITHUB_REPO_URL =
   "https://github.com/ChakmingLeung/Side-Shortcuts-Popout";
 
-
-
 export const DEFAULT_SETTINGS = {
   /** null = follow browser; "zh" | "en" */
   locale: null,
@@ -20,29 +16,27 @@ export const DEFAULT_SETTINGS = {
   theme: "system",
 };
 
-
+/** 首次安装时的示例快捷入口 */
+export const DEFAULT_INSTALL_SHORTCUTS = [
+  { title: "语雀", url: "https://www.yuque.com/" },
+  { title: "小红书", url: "https://www.xiaohongshu.com/explore" },
+  { title: "抖音", url: "https://www.douyin.com/jingxuan" },
+  { title: "Instagram", url: "https://www.instagram.com/" },
+  { title: "TikTok", url: "https://www.tiktok.com/" },
+];
 
 /**
-
  * 仅对确认存在对应移动站且路径兼容的域名做主机映射（小窗打开时使用）。
-
  */
-
 const HOST_TO_MOBILE = {
-
   "www.bilibili.com": "m.bilibili.com",
-
   "bilibili.com": "m.bilibili.com",
-
   "www.weibo.com": "m.weibo.cn",
-
   "weibo.com": "m.weibo.cn",
-
 };
 
+const DEFAULT_FAVICON_FALLBACK = "🔗";
 
-
-/** 同时写入本机 local + 账号 sync；重载扩展不会清空，登录浏览器账号可跨设备同步 */
 async function storageSet(key, value) {
   await chrome.storage.local.set({ [key]: value });
   try {
@@ -52,19 +46,24 @@ async function storageSet(key, value) {
   }
 }
 
-async function readShortcutsFromAreas() {
-  let syncList;
-  let localList;
+async function readFromAreas(key) {
+  let syncVal;
+  let localVal;
   try {
-    syncList = (await chrome.storage.sync.get(STORAGE_KEY))[STORAGE_KEY];
+    syncVal = (await chrome.storage.sync.get(key))[key];
   } catch {
     /* sync 不可用 */
   }
   try {
-    localList = (await chrome.storage.local.get(STORAGE_KEY))[STORAGE_KEY];
+    localVal = (await chrome.storage.local.get(key))[key];
   } catch {
     /* */
   }
+  return { syncVal, localVal };
+}
+
+async function readShortcutsFromAreas() {
+  const { syncVal: syncList, localVal: localList } = await readFromAreas(STORAGE_KEY);
   if (Array.isArray(syncList) && syncList.length > 0) return syncList;
   if (Array.isArray(localList) && localList.length > 0) return localList;
   if (Array.isArray(syncList)) return syncList;
@@ -81,17 +80,8 @@ export async function saveShortcuts(shortcuts) {
 }
 
 export async function getLastShortcutId() {
-  try {
-    const sync = (await chrome.storage.sync.get(LAST_KEY))[LAST_KEY];
-    if (sync) return sync;
-  } catch {
-    /* */
-  }
-  try {
-    return (await chrome.storage.local.get(LAST_KEY))[LAST_KEY] ?? null;
-  } catch {
-    return null;
-  }
+  const { syncVal, localVal } = await readFromAreas(LAST_KEY);
+  return syncVal ?? localVal ?? null;
 }
 
 export async function setLastShortcutId(id) {
@@ -99,45 +89,29 @@ export async function setLastShortcutId(id) {
 }
 
 export async function hasStoredSettings() {
-  try {
-    const sync = await chrome.storage.sync.get(SETTINGS_KEY);
-    if (sync[SETTINGS_KEY]) return true;
-  } catch {
-    /* */
-  }
-  try {
-    const local = await chrome.storage.local.get(SETTINGS_KEY);
-    return Boolean(local[SETTINGS_KEY]);
-  } catch {
-    return false;
-  }
+  const { syncVal, localVal } = await readFromAreas(SETTINGS_KEY);
+  return Boolean(syncVal || localVal);
 }
 
 export async function getSettings() {
-  let stored = {};
-  try {
-    stored = { ...(await chrome.storage.local.get(SETTINGS_KEY))[SETTINGS_KEY] };
-  } catch {
-    /* */
-  }
-  try {
-    stored = { ...stored, ...(await chrome.storage.sync.get(SETTINGS_KEY))[SETTINGS_KEY] };
-  } catch {
-    /* */
-  }
-  return { ...DEFAULT_SETTINGS, ...stored };
+  const { syncVal, localVal } = await readFromAreas(SETTINGS_KEY);
+  return { ...DEFAULT_SETTINGS, ...localVal, ...syncVal };
 }
 
 export async function saveSettings(settings) {
   await storageSet(SETTINGS_KEY, settings);
 }
 
-
-
-const DEFAULT_FAVICON_FALLBACK = "🔗";
+export function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
 
 /**
- * 与书签栏一致：优先 Chrome 已缓存的站点图标（需 manifest 中 favicon 权限），再尝试常见回退源。
+ * 与书签栏一致：Chrome 缓存 favicon（需 manifest favicon 权限），再尝试站点 /favicon.ico。
  * @returns {string[]}
  */
 export function getFaviconCandidateUrls(urlString, size = 32) {
@@ -145,9 +119,8 @@ export function getFaviconCandidateUrls(urlString, size = 32) {
   if (!pageUrl) return [];
 
   const urls = [];
-
   try {
-    if (typeof chrome !== "undefined" && chrome.runtime?.getURL) {
+    if (chrome.runtime?.getURL) {
       const favicon = new URL(chrome.runtime.getURL("/_favicon/"));
       favicon.searchParams.set("pageUrl", pageUrl);
       favicon.searchParams.set("size", String(size));
@@ -156,25 +129,12 @@ export function getFaviconCandidateUrls(urlString, size = 32) {
   } catch {
     /* */
   }
-
   try {
-    const u = new URL(pageUrl);
-    urls.push(`${u.origin}/favicon.ico`);
-    urls.push(
-      `https://www.google.com/s2/favicons?domain=${encodeURIComponent(u.hostname)}&sz=${size}`
-    );
-    urls.push(`https://icons.duckduckgo.com/ip3/${u.hostname}.ico`);
+    urls.push(`${new URL(pageUrl).origin}/favicon.ico`);
   } catch {
     /* */
   }
-
-  return [...new Set(urls)];
-}
-
-/** @returns {string | null} 首选 favicon URL */
-export function getFaviconUrl(urlString, size = 32) {
-  const candidates = getFaviconCandidateUrls(urlString, size);
-  return candidates[0] ?? null;
+  return urls;
 }
 
 function tryLoadFaviconImage(wrap, className, size, candidates, index = 0) {
@@ -202,11 +162,6 @@ function tryLoadFaviconImage(wrap, className, size, candidates, index = 0) {
   wrap.append(img);
 }
 
-/**
- * 根据网址创建图标节点（img + 多级回退，效果接近浏览器书签）
- * @param {string} url
- * @param {{ size?: number, className?: string }} [opts]
- */
 export function createShortcutIcon(url, { size = 22, className = "shortcut-icon" } = {}) {
   const wrap = document.createElement("span");
   wrap.className = `${className}-wrap`;
@@ -230,126 +185,65 @@ function appendFaviconFallback(wrap, className) {
 }
 
 export function normalizeUrl(raw) {
-
   const trimmed = raw.trim();
-
   if (!trimmed) return "";
-
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
-
   return `https://${trimmed}`;
-
 }
-
-
 
 export function isValidUrl(raw) {
-
   try {
-
     const url = new URL(normalizeUrl(raw));
-
     return url.protocol === "http:" || url.protocol === "https:";
-
   } catch {
-
     return false;
-
   }
-
 }
-
-
 
 export function toMobileUrl(urlString) {
-
   try {
-
     const url = new URL(normalizeUrl(urlString));
-
     const host = url.hostname.toLowerCase();
-
     const mapped = HOST_TO_MOBILE[host];
-
-    if (!mapped || mapped === host) {
-
-      return null;
-
-    }
-
+    if (!mapped || mapped === host) return null;
     url.hostname = mapped;
-
     return url.toString();
-
   } catch {
-
     return null;
-
   }
-
 }
-
-
 
 /** 未显式关闭时视为移动版（含历史数据 mobile: null） */
 export function shouldUseMobile(shortcut) {
   return shortcut.mobile !== false;
 }
 
-
-
 export async function resolveLoadUrl(shortcut) {
   const canonical = normalizeUrl(shortcut.url);
 
   if (!shouldUseMobile(shortcut)) {
-
     return {
-
       loadUrl: canonical,
-
       canonicalUrl: canonical,
-
       mobile: false,
-
       urlTransformed: false,
-
     };
-
   }
-
-
 
   const mobileUrl = toMobileUrl(canonical);
-
   if (mobileUrl) {
-
     return {
-
       loadUrl: mobileUrl,
-
       canonicalUrl: canonical,
-
       mobile: true,
-
       urlTransformed: true,
-
     };
-
   }
 
-
-
   return {
-
     loadUrl: canonical,
-
     canonicalUrl: canonical,
-
     mobile: true,
-
     urlTransformed: false,
-
   };
-
 }
-

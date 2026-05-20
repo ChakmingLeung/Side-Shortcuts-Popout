@@ -4,6 +4,7 @@ import {
   setLastShortcutId,
   resolveLoadUrl,
   createShortcutIcon,
+  escapeHtml,
 } from "./shared.js";
 import { initI18n, t, applyDocumentI18n, applyToolbarI18n } from "./i18n.js";
 import { initTheme, applyTheme } from "./theme.js";
@@ -102,7 +103,7 @@ async function renderShortcuts(shortcuts) {
   shortcutsCache = shortcuts;
   removeStalePopouts(shortcuts);
 
-  shortcutList.replaceChildren();
+  const fragment = document.createDocumentFragment();
   emptyState.hidden = shortcuts.length > 0;
 
   for (const item of shortcuts) {
@@ -122,22 +123,16 @@ async function renderShortcuts(shortcuts) {
     btn.append(createShortcutIcon(item.url, { className: "shortcut-icon" }), text);
     btn.addEventListener("click", () => openShortcut(item));
     li.appendChild(btn);
-    shortcutList.appendChild(li);
+    fragment.appendChild(li);
   }
+
+  shortcutList.replaceChildren(fragment);
 
   const highlightId =
     lastOpenedId && shortcuts.some((s) => s.id === lastOpenedId)
       ? lastOpenedId
       : null;
   highlightActive(highlightId);
-}
-
-function escapeHtml(str) {
-  return str
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
 }
 
 function applySidepanelI18n() {

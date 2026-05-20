@@ -6,8 +6,8 @@
 
 | Attribute | Value |
 |-----------|-------|
-| Doc version | v2.2.3 |
-| Product version | 2.2.3 |
+| Doc version | v2.2.4 |
+| Product version | 2.2.4 |
 | Last updated | 2026-05-19 |
 | Status | Open source |
 | Platforms | Microsoft Edge 114+, Google Chrome 114+ |
@@ -163,7 +163,8 @@ After Edge removes built-in sidebar shortcuts, users can still **open favorite s
 
 | Version | Highlights |
 |---------|------------|
-| **v2.2.3** (current) | Options layout, inline edit, import/export UX, header author info |
+| **v2.2.4** (current) | Code cleanup, favicon fallback trim, author profile link |
+| v2.2.3 | Options layout, inline edit, import/export UX, header author info |
 | v2.2.1 | JSON backup import/export |
 | v2.2.0 | Appearance theme |
 | v2.1.9 | Removed global mobile toggle; new shortcuts default mobile |
