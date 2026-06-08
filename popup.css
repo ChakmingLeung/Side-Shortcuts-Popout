@@ -1,0 +1,78 @@
+html,
+body {
+  margin: 0;
+  width: 252px;
+  max-height: 520px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  max-height: 520px;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.popup-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.popup-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.popup-main {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 4px 6px 6px;
+}
+
+.shortcut-list {
+  gap: 4px;
+}
+
+.shortcut-btn {
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.shortcut-btn:hover {
+  background: var(--surface);
+}
+
+.shortcut-btn:active {
+  transform: scale(0.99);
+}
+
+.popup .shortcut-title {
+  font-weight: 500;
+}
+
+.empty-state {
+  margin: 16px 8px;
+  font-size: 13px;
+}

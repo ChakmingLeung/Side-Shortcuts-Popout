@@ -6,29 +6,8 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.2.4-blue.svg)](CHANGELOG.md)
-
-**仓库地址：** [github.com/ChakmingLeung/Side-Shortcuts-Popout](https://github.com/ChakmingLeung/Side-Shortcuts-Popout)
 
 在 Microsoft Edge [逐步下线内置侧边栏 App Tower](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge) 的背景下，本扩展通过浏览器原生 **Side Panel（侧边栏）** API，纵向列出可配置的网页快捷入口；**点击即在独立小窗打开**，与主窗口并排浏览，登录态与常规标签页一致。
-
-> 产品文档：[PRD（中文）](docs/PRD.zh-CN.md) · [架构（中文）](docs/ARCHITECTURE.zh-CN.md)
-
----
-
-## 为何不做侧栏内嵌（iframe）预览？
-
-早期版本（v1.x）曾在侧栏里用 **iframe** 嵌套显示目标网页，以便「主窗口 + 侧栏」同时看两个站。实测与平台限制下，该方案**对用户不友好**，自 **v2.0.0** 起已**放弃**，改为「侧栏快捷列表 + 点击小窗打开」。
-
-| 问题 | 说明 |
-|------|------|
-| **扩展 API 限制** | [Side Panel](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) 只能加载扩展自己的页面（如 `sidepanel.html`），不能把侧栏直接设为 `https://…`，外站只能再套一层 iframe。 |
-| **Cookie / 登录隔离** | 侧栏 iframe 与常规标签页的 Cookie **分区不同**（与扩展顶层、CHIPS 等有关），常出现「标签页已登录、侧栏未登录」或扫码失败；靠 DNR 注入 Cookie 等补丁脆弱且需额外权限。 |
-| **站点禁止嵌入** | 大量站点通过 `X-Frame-Options`、CSP `frame-ancestors` 等拒绝被 iframe 加载；即使用 `declarativeNetRequest` 改响应头，仍可能被前端脚本检测 `window.top !== window.self` 而禁用登录/二维码。 |
-| **与 Edge 内置侧栏差异** | 旧版 Edge 侧栏由浏览器在**独立顶层浏览上下文**中打开网页，Cookie 与登录与正常窗口一致；扩展 iframe 方案无法等价复现。 |
-| **维护成本** | 为少数可嵌站点维护白名单、移动 UA、去响应头、Cookie 同步等逻辑，权限面大（`<all_urls>`、`cookies`、DNR），仍无法覆盖小红书等强登录场景。 |
-
-**当前方案：** 侧栏只负责**纵向展示快捷入口**；点击后用 `window.open` 打开**独立小窗**（正常浏览器环境），登录、扫码、支付与标签页行为一致。详见 [CHANGELOG.md](CHANGELOG.md) 中 v2.0.0 说明。
 
 ---
 
@@ -36,148 +15,58 @@
 
 | 能力 | 说明 |
 |------|------|
-| 可配置快捷入口 | 自定义名称、URL；图标自动取自网站 favicon（与书签栏同源缓存） |
-| 小窗打开 | 点击快捷入口在独立小窗打开（可并存多个） |
-| 摸鱼友好 | 主窗口照常办公/学习，侧栏一键开小窗刷小红书、抖音、Ins 等；小窗关了就收，不占主标签 |
-| 低调并排 | 侧栏只占一条窄列，不像全屏切站那么显眼；需要时焦点切回主窗口即可 |
-| 移动版 (WAP) | 新建默认移动版；B 站、微博等白名单转 `m.` 域名；其余使用保存的 URL |
-| 外观主题 | 设置页可选跟随系统 / 浅色 / 深色（侧栏同步） |
-| 备份与恢复 | 「已保存的入口」标题栏可导出/导入 JSON，卸载或重装后恢复配置 |
-| 设置页布局 | 左侧添加入口，右侧列表；列表内 **编辑** 就地展开，无需滚回表单 |
-| 纵向列表 | 侧栏仅展示快捷入口，无 iframe 内嵌 |
-| 地址不被篡改 | 存储的配置 URL 始终为用户填写的原始地址（v1.1.1+） |
-| 配置同步 | 使用 `chrome.storage.sync`，同账号多设备可同步（未卸载时） |
-| 界面语言 | 侧边栏与设置页支持简体中文 / English / 跟随浏览器 |
-| 隐私友好 | 不采集、不上传浏览数据 |
-
-## 截图
-
-| 侧栏快捷列表 | 快捷入口管理 |
-|:---:|:---:|
-| *待补充* | *待补充* |
+| 可配置快捷入口 | 自定义名称、URL；图标自动取自网站 favicon |
+| 小窗打开 | 点击后在独立 popout 小窗打开（可多窗并存） |
+| 浏览进度 | 小窗仍开着时再点 → 只聚焦、不刷新；关窗后再点 → 本次浏览器会话内恢复上次页面 URL |
+| 回到起始页 | **Shift+点击** 或 **右键「从头打开」** → 加载设置里配置的起始网址 |
+| 移动 / 桌面 | 每条入口单独选择；移动版用 Android UA + 375px 宽 + viewport 注入 |
+| 打开方式 | 工具栏图标可切换 **侧栏列表** 或 **弹出菜单** |
+| 外观主题 | 设置页可选跟随系统 / 浅色 / 深色 |
+| 备份与恢复 | 导出/导入 JSON 配置 |
+| 配置同步 | 登录浏览器账号后，修改可通过 `chrome.storage.sync` 同步 |
+| 界面语言 | 简体中文 / English / 跟随浏览器 |
 
 ## 环境要求
 
 - **Microsoft Edge 114+** 或 **Google Chrome 114+**
-- 权限：`storage`、`sidePanel`、`favicon`（读取站点图标，与书签栏一致）
 
-## 快速安装
+## 安装
 
-### 方式一：下载 Release（推荐，下载即用）
+### 从源码加载（开发者模式）
 
-1. 打开 [Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases) 页面
-2. 下载最新版的 **`Side-Shortcuts-Popout-v*.zip`**
-3. 解压到任意文件夹（解压后该文件夹根目录应能看到 `manifest.json`）
-4. **Edge：** 打开 `edge://extensions/` → 开启 **开发人员模式** → **加载解压缩的扩展** → 选中解压后的文件夹  
-5. **Chrome：** 打开 `chrome://extensions/` → 开启 **开发者模式** → **加载已解压的扩展程序** → 选中解压后的文件夹  
-6. **将扩展固定到工具栏（推荐）：** 点击浏览器工具栏的 **扩展图标（拼图）** → 在列表中找到 **「侧栏快捷小窗」** → 点击 **图钉** Pin，固定后工具栏一键打开侧栏  
-7. 点击工具栏上的扩展图标，在侧栏中使用
+1. 克隆或下载本仓库
+2. **Edge：** `edge://extensions/` → 开启 **开发人员模式** → **加载解压缩的扩展** → 选择项目根目录（含 `manifest.json`）
+3. **Chrome：** `chrome://extensions/` → 开启 **开发者模式** → **加载已解压的扩展程序** → 选择项目根目录
+4. 将扩展 **固定到工具栏**，点击图标打开侧栏
 
-> 说明：此为开发者模式加载，非应用商店安装；浏览器可能提示「未经验证的扩展」，属正常现象。
-
-### 方式二：克隆源码（开发者）
-
-#### Microsoft Edge
-
-1. `git clone https://github.com/ChakmingLeung/Side-Shortcuts-Popout.git`
-2. 打开 `edge://extensions/`，开启 **开发人员模式**
-3. **加载解压缩的扩展**，选择克隆后的项目根目录
-4. 点击扩展图标，或右键 → **在侧边栏中打开**
-
-#### Google Chrome
-
-1. 打开 `chrome://extensions/`，开启 **开发者模式**
-2. **加载已解压的扩展程序**，选择克隆后的项目根目录
+> 开发者模式加载时，浏览器可能提示「未经验证的扩展」，属正常现象。
 
 ### 首次使用
 
-1. **固定到工具栏（Pin to toolbar）：** 扩展图标（拼图）→ **侧栏快捷小窗** → 图钉固定，便于随时打开侧栏  
-2. 预置语雀、小红书、抖音、Instagram、TikTok 示例，可在设置中修改  
-3. 打开侧栏，点击入口即可在小窗打开  
-4. 需增删改入口：侧栏右上角 **齿轮** 或扩展 **选项** 页；在列表中点 **编辑** 可就地修改，无需滚回左侧表单
+1. 首次安装预置 9 个常用入口，可在 **选项** 页修改
+2. 点击侧栏入口在小窗打开；右上角 **齿轮** 进入设置
+3. 卸载或换电脑前，请在选项页 **导出配置** 以便恢复
 
-## 快捷方式会丢失吗？数据存在哪？
+## 小窗操作
 
-**不会**因为点击扩展管理页的「重新加载」而清空。保存快捷入口时，扩展会写入：
-
-| 存储 | 作用 |
+| 操作 | 效果 |
 |------|------|
-| **`chrome.storage.local`** | 本机持久化；重载、关闭浏览器后仍在 |
-| **`chrome.storage.sync`** | 登录 Chrome / Edge 账号并开启同步时，可同步到其他设备 |
+| 普通点击 | 开小窗；关窗后再点尽量恢复上次 URL（同一次浏览器会话） |
+| 小窗仍开着时再点 | 只聚焦，不刷新 |
+| **Shift+点击** / **右键从头打开** | 加载起始网址 |
 
-在 **扩展选项** 里添加或修改的网址会立即写入上述存储，侧栏打开时自动读取，**无需每次重配**。
+## 移动版 / 桌面版
 
-**仍会丢失配置的情况：**
-
-- **卸载**扩展（浏览器会删除该扩展的本地与同步存储，**重装后不能指望自动恢复**）
-- 在浏览器设置里 **清除扩展数据 / 浏览数据** 并勾选扩展项
-
-**建议：**
-
-- 日常：登录 Chrome / Edge 并开启同步，可在多设备间同步（未卸载时有效）
-- 卸载、换电脑或从 **Edge 加载项商店** 重装前：在选项页 **「已保存的入口」** 右侧 **导出配置**，重装后 **导入配置**（先选合并或替换，再选 JSON 文件）即可恢复
-- 开发时尽量用「重新加载」，不要删除后重新「加载已解压的扩展程序」
-
-## 移动版 (WAP) 说明
-
-新建快捷入口 **默认移动版**；编辑时可改为桌面版：
-
-- **B 站、微博等**：移动版时小窗打开对应 `m.` 地址
-- **不修改**你已保存的配置地址
-- 每条入口可单独选择：移动版 / 桌面版
-
-## 项目结构
-
-```
-Side-Shortcuts-Popout/
-├── manifest.json
-├── background.js
-├── shared.js
-├── theme.js
-├── backup.js
-├── i18n.js
-├── sidepanel.html/js/css
-├── options.html/js/css
-├── icons/
-├── scripts/
-└── docs/
-    ├── PRD.md / PRD.zh-CN.md
-    └── ARCHITECTURE.md / ARCHITECTURE.zh-CN.md
-```
-
-## 开发
-
-```powershell
-# 可选：重新生成图标
-powershell -ExecutionPolicy Bypass -File .\scripts\generate-icons.ps1
-
-# 修改 manifest.json 版本号后 — 同步各文档中的版本
-powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
-```
-
-修改代码后在扩展管理页点击 **重新加载**。
-
-**文档同步：** 本项目通过 [AGENTS.md](AGENTS.md) 与 `.cursor/rules/github-docs-sync.mdc` 约束 Cursor 在改代码时同步更新中英文档。详见 [docs/MAINTENANCE.zh-CN.md](docs/MAINTENANCE.zh-CN.md)。
-
-## 更新日志
-
-见 [CHANGELOG.md](CHANGELOG.md)。当前最新：**v2.2.4** — 作者主页链接、代码精简与 favicon 回退优化等。
+- **存储的 URL** 始终为你填写的内容，扩展不会自动改写
+- **移动版**：小窗约 **375px** 宽，Android UA + viewport
+- **桌面版**：小窗约 **420px** 宽，原生 UA
+- 需要移动站时请填写移动地址（如 `https://m.weibo.cn/`）
 
 ## 已知限制
 
-小窗由浏览器弹窗策略管理；若被拦截，请在站点权限中允许弹窗。小窗尺寸固定约 420px 宽，可手动拉大。
-
-## 文档
-
-| 文档 | 说明 |
-|------|------|
-| [docs/PRD.zh-CN.md](docs/PRD.zh-CN.md) | 产品需求文档（中文） |
-| [docs/PRD.md](docs/PRD.md) | Product Requirements (English) |
-| [docs/ARCHITECTURE.zh-CN.md](docs/ARCHITECTURE.zh-CN.md) | 技术架构（中文） |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Architecture (English) |
-| [CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md) | 贡献指南（中文） |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contributing (English) |
-| [CHANGELOG.md](CHANGELOG.md) | 版本更新记录（中英） |
+- 小窗受浏览器弹窗策略限制；被拦截时请在站点权限中允许弹窗
+- **续看**仅恢复 URL，不保证滚动位置或未提交表单；关闭浏览器后 session 清空
+- 扩展无法将小窗设为「总在最前」
 
 ## 隐私
 
@@ -189,4 +78,4 @@ powershell -ExecutionPolicy Bypass -File .\scripts\sync-doc-version.ps1
 
 ## 免责声明
 
-本项目与 Microsoft、Google 无隶属关系。Edge 侧边栏变更以 [Microsoft 官方说明](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge) 为准。
+本项目与 Microsoft、Google 无隶属关系。

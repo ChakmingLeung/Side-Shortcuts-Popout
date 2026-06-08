@@ -1,16 +1,16 @@
-﻿import {
+import {
   getShortcuts,
   saveShortcuts,
   getSettings,
   saveSettings,
   normalizeUrl,
   isValidUrl,
-  toMobileUrl,
   shouldUseMobile,
   createShortcutIcon,
   escapeHtml,
   GITHUB_AUTHOR_URL,
   GITHUB_REPO_URL,
+  normalizeLauncherMode,
 } from "./shared.js";
 import {
   initI18n,
@@ -20,6 +20,7 @@ import {
   syncLanguageSelect,
 } from "./i18n.js";
 import { initTheme, syncThemeSelect, setThemePreference, applyTheme } from "./theme.js";
+import { syncLauncherModeSelect } from "./launcher.js";
 import {
   buildBackupPayload,
   downloadBackupJson,
@@ -34,6 +35,7 @@ const urlInput = document.getElementById("url");
 const mobileModeSelect = document.getElementById("mobile-mode");
 const languageSelect = document.getElementById("language");
 const themeSelect = document.getElementById("theme");
+const launcherModeSelect = document.getElementById("launcher-mode");
 const formError = document.getElementById("form-error");
 const manageList = document.getElementById("manage-list");
 const manageEmpty = document.getElementById("manage-empty");
@@ -45,10 +47,12 @@ const importReplaceBtn = document.getElementById("import-replace");
 const importPanelCloseBtn = document.getElementById("import-panel-close");
 const importBackupFile = document.getElementById("import-backup-file");
 const backupStatus = document.getElementById("backup-status");
-/** @type {string | null} 鍙充晶鍒楄〃鍐呰仈缂栬緫涓殑蹇嵎鏂瑰紡 id */
+/** @type {string | null} 右侧列表内联编辑中的快捷方式 id */
 let editingInlineId = null;
 /** @type {"merge" | "replace" | null} */
 let pendingImportMode = null;
+/** @type {string | null} 拖拽排序中的条目 id */
+let draggingShortcutId = null;
 
 function newId() {
   return crypto.randomUUID();
@@ -77,6 +81,91 @@ function resetForm() {
   form.reset();
   mobileModeSelect.value = "on";
   formError.hidden = true;
+}
+
+function createDragHandle() {
+  const handle = document.createElement("span");
+  handle.className = "drag-handle";
+  handle.draggable = true;
+  handle.role = "button";
+  handle.tabIndex = 0;
+  handle.title = t("dragHandleLabel");
+  handle.setAttribute("aria-label", t("dragHandleLabel"));
+  handle.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM9 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM9 16a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" fill="currentColor"/></svg>`;
+  return handle;
+}
+
+function getDragAfterElement(container, y) {
+  const items = [...container.querySelectorAll(".manage-item:not(.is-dragging):not(.manage-item-editing)")];
+  return items.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      }
+      return closest;
+    },
+    { offset: Number.NEGATIVE_INFINITY, element: null }
+  ).element;
+}
+
+async function persistShortcutsOrderFromDom() {
+  const ids = [...manageList.querySelectorAll(".manage-item[data-id]")].map((el) => el.dataset.id);
+  const shortcuts = await getShortcuts();
+  const byId = new Map(shortcuts.map((s) => [s.id, s]));
+  const reordered = ids.map((id) => byId.get(id)).filter(Boolean);
+  for (const shortcut of shortcuts) {
+    if (!ids.includes(shortcut.id)) reordered.push(shortcut);
+  }
+  if (reordered.length !== shortcuts.length) return;
+  const unchanged = reordered.every((s, i) => s.id === shortcuts[i]?.id);
+  if (unchanged) return;
+  await saveShortcuts(reordered);
+}
+
+function setupManageListDragDrop() {
+  manageList.addEventListener("dragstart", (e) => {
+    const handle = e.target.closest(".drag-handle");
+    if (!handle) {
+      e.preventDefault();
+      return;
+    }
+    const li = handle.closest(".manage-item");
+    if (!li || li.classList.contains("manage-item-editing")) {
+      e.preventDefault();
+      return;
+    }
+    draggingShortcutId = li.dataset.id;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", draggingShortcutId);
+    li.classList.add("is-dragging");
+  });
+
+  manageList.addEventListener("dragend", () => {
+    manageList.querySelector(".is-dragging")?.classList.remove("is-dragging");
+    draggingShortcutId = null;
+  });
+
+  manageList.addEventListener("dragover", (e) => {
+    if (!draggingShortcutId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    const dragging = manageList.querySelector(".is-dragging");
+    if (!dragging) return;
+    const afterElement = getDragAfterElement(manageList, e.clientY);
+    if (afterElement == null) {
+      manageList.appendChild(dragging);
+    } else {
+      manageList.insertBefore(dragging, afterElement);
+    }
+  });
+
+  manageList.addEventListener("drop", (e) => {
+    e.preventDefault();
+    if (!draggingShortcutId) return;
+    persistShortcutsOrderFromDom().catch(() => {});
+  });
 }
 
 function scrollManageItemIntoView(li) {
@@ -136,13 +225,14 @@ function buildInlineEditItem(item) {
   }
   inlineMobile.value = mobileToSelect(item.mobile);
 
+  const nameField = createInlineField(t("fieldName"), inlineTitle);
+  const openModeField = createInlineField(t("fieldOpenMode"), inlineMobile);
+  const urlField = createInlineField(t("fieldUrl"), inlineUrl);
+  urlField.classList.add("field-url");
+
   const fields = document.createElement("div");
   fields.className = "manage-inline-fields";
-  fields.append(
-    createInlineField(t("fieldName"), inlineTitle),
-    createInlineField(t("fieldUrl"), inlineUrl),
-    createInlineField(t("fieldOpenMode"), inlineMobile)
-  );
+  fields.append(nameField, openModeField, urlField);
 
   const inlineError = document.createElement("p");
   inlineError.className = "error";
@@ -212,6 +302,18 @@ function openInlineEdit(item) {
   });
 }
 
+function createOpenModeBadge(mobile) {
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  const label = mobile ? t("mobileBadge") : t("desktopBadge");
+  badge.title = label;
+  badge.setAttribute("aria-label", label);
+  badge.innerHTML = mobile
+    ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M9 2h6a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm1 2v12h4V4h-4Zm2 15a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" fill="currentColor"/></svg>`
+    : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1v2l-3-2H6a2 2 0 0 1-2-2V5Zm2 0v8h12V5H6Z" fill="currentColor"/></svg>`;
+  return badge;
+}
+
 async function renderManageList(shortcuts) {
   const fragment = document.createDocumentFragment();
   manageEmpty.hidden = shortcuts.length > 0;
@@ -223,30 +325,25 @@ async function renderManageList(shortcuts) {
 
     const mobile = shouldUseMobile(item);
     const canonical = normalizeUrl(item.url);
-    const mappedMobile = mobile ? toMobileUrl(canonical) : null;
-    const loadHint =
-      mappedMobile && mappedMobile !== canonical
-        ? `<span class="manage-load-hint">${escapeHtml(t("manageLoadMapped", { url: mappedMobile }))}</span>`
-        : mobile
-          ? `<span class="manage-load-hint">${escapeHtml(t("manageLoadUa"))}</span>`
-          : "";
 
     const li = document.createElement("li");
     li.className = "manage-item";
     li.dataset.id = item.id;
     li.innerHTML = `
       <div class="manage-info">
-        <div class="manage-title">${escapeHtml(item.title)} <span class="badge">${mobile ? t("mobileBadge") : t("desktopBadge")}</span></div>
-        <div class="manage-url">${escapeHtml(canonical)}
-        ${loadHint}</div>
+        <div class="manage-title"><span class="manage-name">${escapeHtml(item.title)}</span></div>
+        <div class="manage-url">${escapeHtml(canonical)}</div>
       </div>
       <div class="manage-actions">
         <button type="button" class="btn ghost btn-edit">${escapeHtml(t("btnEdit"))}</button>
         <button type="button" class="btn danger btn-delete">${escapeHtml(t("btnDelete"))}</button>
       </div>
     `;
+    li.querySelector(".manage-title").append(createOpenModeBadge(mobile));
     const icon = createShortcutIcon(item.url, { className: "manage-icon" });
+    const dragHandle = createDragHandle();
     li.insertBefore(icon, li.firstChild);
+    li.insertBefore(dragHandle, icon.nextSibling);
     li.querySelector(".btn-edit").addEventListener("click", () => openInlineEdit(item));
     li.querySelector(".btn-delete").addEventListener("click", () =>
       removeShortcut(item.id)
@@ -272,10 +369,17 @@ async function loadSettings() {
   const settings = await getSettings();
   syncLanguageSelect(languageSelect, settings);
   syncThemeSelect(themeSelect, settings);
+  syncLauncherModeSelect(launcherModeSelect, settings);
 }
 
 themeSelect.addEventListener("change", async () => {
   await setThemePreference(themeSelect.value);
+});
+
+launcherModeSelect?.addEventListener("change", async () => {
+  const settings = await getSettings();
+  settings.launcherMode = normalizeLauncherMode(launcherModeSelect.value);
+  await saveSettings(settings);
 });
 
 languageSelect.addEventListener("change", async () => {
@@ -412,6 +516,7 @@ chrome.storage.onChanged.addListener(async (changes) => {
     const settings = changes.settings.newValue ?? {};
     if (settings.theme !== undefined) applyTheme(settings.theme);
     syncThemeSelect(themeSelect, settings);
+    syncLauncherModeSelect(launcherModeSelect, settings);
     await initI18n();
     syncLanguageSelect(languageSelect, settings);
     applyOptionsI18n();
@@ -437,6 +542,7 @@ function applyAuthorFooter() {
 }
 
 async function boot() {
+  setupManageListDragDrop();
   await initTheme();
   await initI18n();
   applyOptionsI18n();

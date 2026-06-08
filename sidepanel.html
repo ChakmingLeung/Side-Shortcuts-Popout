@@ -1,91 +1,80 @@
-﻿<!DOCTYPE html>
-
+<!DOCTYPE html>
 <html lang="zh-CN" data-theme="system">
-
   <head>
-
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <title>Sidebar</title>
-
+    <link rel="stylesheet" href="theme.css" />
+    <link rel="stylesheet" href="launcher-ui.css" />
     <link rel="stylesheet" href="sidepanel.css" />
-
   </head>
-
-  <body data-doc-title="docTitleSidepanel">
-
+  <body data-doc-title="docTitleApp">
     <div id="app" class="app">
-
       <header class="toolbar">
-
         <h1 class="toolbar-title" data-i18n="launcherLabel">Shortcuts</h1>
-
-        <button type="button" id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings">
-
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-
-            <path
-
-              d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
-
-              stroke="currentColor"
-
-              stroke-width="2"
-
-              fill="none"
-
-            />
-
-            <path
-
-              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
-
-              stroke="currentColor"
-
-              stroke-width="2"
-
-              fill="none"
-
-            />
-
-          </svg>
-
-        </button>
-
+        <div class="toolbar-actions">
+          <button
+            type="button"
+            id="btn-switch-menu"
+            class="icon-btn"
+            title="Switch to popup menu"
+            aria-label="Switch to popup menu"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M10 5h10a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"
+                stroke="currentColor"
+                stroke-width="1.75"
+                fill="none"
+              />
+              <path
+                d="M8 12H2M5 9L2 12l3 3"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                fill="none"
+              />
+            </svg>
+          </button>
+          <button type="button" id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </button>
+        </div>
       </header>
 
-
-
       <main class="main" aria-label="Shortcuts">
-
-        <p class="hint" data-i18n="launcherHint">Click a shortcut to open it in a popout window.</p>
         <p class="hint hint-pin" data-i18n="pinToolbarHint">
           Pin this extension to the toolbar for quick access.
         </p>
 
         <ul id="shortcut-list" class="shortcut-list"></ul>
 
-        <p id="empty-state" class="empty-state" hidden>
-
-          <span data-i18n="emptyState">No shortcuts yet.</span>
-
-          <button type="button" id="btn-add-first" class="link-btn" data-i18n="emptyAddFirst">
-
-            Add one
-
-          </button>
-
+        <p class="hint hint-open-mode" data-i18n="openModeSwitchHint">
+          If a page doesn't look right, switch that shortcut to Mobile or Desktop in Settings, then open it again.
         </p>
 
+        <p id="empty-state" class="empty-state" hidden>
+          <span data-i18n="emptyState">No shortcuts yet.</span>
+          <button type="button" id="btn-add-first" class="link-btn" data-i18n="emptyAddFirst">
+            Add one
+          </button>
+        </p>
       </main>
-
     </div>
-
     <script type="module" src="sidepanel.js"></script>
-
   </body>
-
 </html>
-

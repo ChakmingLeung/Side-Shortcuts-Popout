@@ -6,6 +6,7 @@ import {
   saveSettings,
   normalizeUrl,
   isValidUrl,
+  normalizeLauncherMode,
 } from "./shared.js";
 import { normalizeTheme } from "./theme.js";
 
@@ -37,6 +38,9 @@ function sanitizeSettings(raw) {
   }
   if (raw.theme !== undefined) {
     settings.theme = normalizeTheme(raw.theme);
+  }
+  if (raw.launcherMode !== undefined) {
+    settings.launcherMode = normalizeLauncherMode(raw.launcherMode);
   }
   return settings;
 }
@@ -135,7 +139,7 @@ export async function applyBackupImport(parsed, mode) {
     await saveSettings({ ...current, ...importedSettings });
   }
 
-  return { shortcutCount: merged.length, importedCount: imported.length };
+  return { shortcutCount: merged.length };
 }
 
 export function downloadBackupJson(payload) {

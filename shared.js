@@ -2,6 +2,9 @@ const STORAGE_KEY = "shortcuts";
 const LAST_KEY = "lastShortcutId";
 const SETTINGS_KEY = "settings";
 
+/** @internal 首次安装 local 预置标记（勿写入 sync） */
+export const INSTALL_LOCAL_SEED_KEY = "shortcutsLocalSeed";
+
 /** 作者 GitHub 主页（设置页「作者」链接） */
 export const GITHUB_AUTHOR_URL = "https://github.com/ChakmingLeung";
 
@@ -14,26 +17,13 @@ export const DEFAULT_SETTINGS = {
   locale: null,
   /** "system" | "light" | "dark" */
   theme: "system",
+  /** "menu" | "sidebar" — toolbar icon opens popup menu or side panel list */
+  launcherMode: "sidebar",
 };
 
-/** 首次安装时的示例快捷入口 */
-export const DEFAULT_INSTALL_SHORTCUTS = [
-  { title: "语雀", url: "https://www.yuque.com/" },
-  { title: "小红书", url: "https://www.xiaohongshu.com/explore" },
-  { title: "抖音", url: "https://www.douyin.com/jingxuan" },
-  { title: "Instagram", url: "https://www.instagram.com/" },
-  { title: "TikTok", url: "https://www.tiktok.com/" },
-];
-
-/**
- * 仅对确认存在对应移动站且路径兼容的域名做主机映射（小窗打开时使用）。
- */
-const HOST_TO_MOBILE = {
-  "www.bilibili.com": "m.bilibili.com",
-  "bilibili.com": "m.bilibili.com",
-  "www.weibo.com": "m.weibo.cn",
-  "weibo.com": "m.weibo.cn",
-};
+export function normalizeLauncherMode(value) {
+  return value === "sidebar" ? "sidebar" : "menu";
+}
 
 const DEFAULT_FAVICON_FALLBACK = "🔗";
 
@@ -50,14 +40,14 @@ async function readFromAreas(key) {
   let syncVal;
   let localVal;
   try {
-    syncVal = (await chrome.storage.sync.get(key))[key];
+    const [syncStored, localStored] = await Promise.all([
+      chrome.storage.sync.get(key).catch(() => ({})),
+      chrome.storage.local.get(key).catch(() => ({})),
+    ]);
+    syncVal = syncStored[key];
+    localVal = localStored[key];
   } catch {
-    /* sync 不可用 */
-  }
-  try {
-    localVal = (await chrome.storage.local.get(key))[key];
-  } catch {
-    /* */
+    /* storage 不可用 */
   }
   return { syncVal, localVal };
 }
@@ -69,6 +59,42 @@ async function readShortcutsFromAreas() {
   if (Array.isArray(syncList)) return syncList;
   if (Array.isArray(localList)) return localList;
   return [];
+}
+
+/** 是否已有用户保存的快捷入口（sync 已有该键、或 local 有条目 → 不写预置） */
+export async function hasSavedShortcuts() {
+  const { syncVal, localVal } = await readFromAreas(STORAGE_KEY);
+  if (Array.isArray(syncVal)) return true;
+  if (Array.isArray(localVal) && localVal.length > 0) return true;
+  return false;
+}
+
+/** 云端已有数据、本机 local 为空时，把 shortcuts 写入 local 便于离线读取 */
+export async function ensureLocalShortcutsCache(shortcuts) {
+  if (!Array.isArray(shortcuts) || shortcuts.length === 0) return;
+  try {
+    const stored = await chrome.storage.local.get([STORAGE_KEY, INSTALL_LOCAL_SEED_KEY]);
+    const localList = stored[STORAGE_KEY];
+    const wasEarlySeed = stored[INSTALL_LOCAL_SEED_KEY];
+    if (!wasEarlySeed && Array.isArray(localList) && localList.length > 0) return;
+    await chrome.storage.local.set({ [STORAGE_KEY]: shortcuts });
+    if (wasEarlySeed) {
+      await chrome.storage.local.remove(INSTALL_LOCAL_SEED_KEY);
+    }
+  } catch {
+    /* */
+  }
+}
+
+export async function ensureLocalSettingsCache(settings) {
+  if (!settings || typeof settings !== "object") return;
+  try {
+    const local = (await chrome.storage.local.get(SETTINGS_KEY))[SETTINGS_KEY];
+    if (local) return;
+    await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
+  } catch {
+    /* */
+  }
 }
 
 export async function getShortcuts() {
@@ -200,50 +226,24 @@ export function isValidUrl(raw) {
   }
 }
 
-export function toMobileUrl(urlString) {
-  try {
-    const url = new URL(normalizeUrl(urlString));
-    const host = url.hostname.toLowerCase();
-    const mapped = HOST_TO_MOBILE[host];
-    if (!mapped || mapped === host) return null;
-    url.hostname = mapped;
-    return url.toString();
-  } catch {
-    return null;
-  }
-}
-
 /** 未显式关闭时视为移动版（含历史数据 mobile: null） */
 export function shouldUseMobile(shortcut) {
   return shortcut.mobile !== false;
 }
 
-export async function resolveLoadUrl(shortcut) {
-  const canonical = normalizeUrl(shortcut.url);
+/** @param {Array<{ id: string, url: string }>} shortcuts */
+export function findShortcutByUrl(urlString, shortcuts) {
+  const canonical = normalizeUrl(urlString);
+  return shortcuts.find((s) => normalizeUrl(s.url) === canonical) ?? null;
+}
 
-  if (!shouldUseMobile(shortcut)) {
-    return {
-      loadUrl: canonical,
-      canonicalUrl: canonical,
-      mobile: false,
-      urlTransformed: false,
-    };
-  }
+export function contextPopoutShortcutId(urlString) {
+  return `__ctx__:${normalizeUrl(urlString)}`;
+}
 
-  const mobileUrl = toMobileUrl(canonical);
-  if (mobileUrl) {
-    return {
-      loadUrl: mobileUrl,
-      canonicalUrl: canonical,
-      mobile: true,
-      urlTransformed: true,
-    };
-  }
-
+export function resolveLoadUrl(shortcut) {
   return {
-    loadUrl: canonical,
-    canonicalUrl: canonical,
-    mobile: true,
-    urlTransformed: false,
+    loadUrl: normalizeUrl(shortcut.url),
+    mobile: shouldUseMobile(shortcut),
   };
 }

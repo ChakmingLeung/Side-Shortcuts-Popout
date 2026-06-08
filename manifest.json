@@ -1,12 +1,23 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "2.2.4",
+  "version": "2.5.3",
   "description": "__MSG_extDescription__",
   "default_locale": "zh_CN",
-  "permissions": ["storage", "sidePanel", "favicon"],
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "favicon",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "scripting",
+    "webNavigation",
+    "contextMenus"
+  ],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_title": "__MSG_actionTitle__",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

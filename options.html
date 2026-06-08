@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>侧栏快捷小窗 - 设置</title>
+    <link rel="stylesheet" href="theme.css" />
     <link rel="stylesheet" href="options.css" />
   </head>
   <body data-doc-title="docTitleOptions">
@@ -37,8 +38,13 @@
             <p class="author-version" id="extension-version"></p>
           </div>
         </div>
-        <p class="subtitle" data-i18n="optionsSubtitle">
-          配置快捷入口。侧栏纵向列出，点击即在独立小窗打开，与主窗口并排浏览。
+        <p class="subtitle">
+          <span data-i18n="optionsSubtitle">
+            配置快捷入口。支持弹出菜单与侧栏列表两种模式，可互相切换；点击即在独立小窗打开。
+          </span>
+          <strong class="subtitle-emphasis" data-i18n="pinToolbarHint">
+            建议将本扩展固定到工具栏：点击扩展图标（拼图）→ 找到「侧栏快捷小窗」→ 点击图钉，即可从工具栏一键打开。
+          </strong>
         </p>
       </header>
 
@@ -61,13 +67,14 @@
               <option value="dark" data-i18n="themeDark">深色</option>
             </select>
           </label>
+          <label class="field">
+            <span data-i18n="launcherMode">点击工具栏图标</span>
+            <select id="launcher-mode">
+              <option value="menu" data-i18n="launcherModeMenu">弹出菜单（图标+名称）</option>
+              <option value="sidebar" data-i18n="launcherModeSidebar">侧栏列表</option>
+            </select>
+          </label>
         </div>
-        <p class="field-hint" data-i18n="pinToolbarHint">
-          建议将本扩展固定到工具栏：扩展图标（拼图）→「侧栏快捷小窗」→ 图钉。
-        </p>
-        <p class="field-hint" data-i18n="storagePersistHint">
-          快捷方式会保存在本机；登录 Chrome/Edge 并开启同步可跨设备。重新加载、浏览器更新不会清空；卸载扩展会删除数据，可在「已保存的入口」导出备份后重装再导入。
-        </p>
       </section>
 
       <div class="shortcuts-layout">
@@ -107,9 +114,6 @@
               <option value="off" data-i18n="openModeOff">桌面版</option>
             </select>
           </label>
-          <p class="field-hint" data-i18n="openModeHint">
-            B 站、微博等会转为移动域名；其余站点使用你保存的网址。不会修改已保存的网址。
-          </p>
           <p id="form-error" class="error" hidden></p>
           <div class="form-actions">
             <button type="submit" class="btn primary" id="btn-save" data-i18n="btnSave">
@@ -141,6 +145,13 @@
             </button>
           </div>
         </div>
+        <p class="list-notice" role="note">
+          <span class="list-notice-icon" aria-hidden="true">!</span>
+          <span data-i18n="storagePersistHint">
+            快捷方式会保存在本机；登录 Chrome/Edge 并开启同步可跨设备。重新加载、浏览器更新不会清空；卸载扩展会删除数据，重装前请先导出备份。
+          </span>
+        </p>
+        <p class="list-reorder-hint" data-i18n="listReorderHint">拖动左侧手柄可调整顺序。</p>
         <div id="import-panel" class="import-panel" hidden>
           <button
             type="button"

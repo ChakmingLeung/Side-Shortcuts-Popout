@@ -15,19 +15,27 @@ desktop.ini
 *.log
 npm-debug.log*
 
-# Optional local overrides (do not commit secrets)
+# Secrets
 .env
 .env.local
 *.local.json
 
-# Local-only GitHub About / Release copy (not published)
-.github/DESCRIPTION.md
+# Marketplace — local only
+/for store/
+/icons/icon300.png
 
-# Edge store assets (screenshots, promo tiles, certification notes — local only)
-for store/
+# Development process — local only
+/docs/
+/scripts/
+/.github/
+AGENTS.md
+CHANGELOG.md
+CONTRIBUTING.md
+CONTRIBUTING.zh-CN.md
+/icons/source.png
 
-# Packaged extension artifacts
-dist/
+# Build artifacts
+/dist/
 *.zip
 *.crx
 *.pem

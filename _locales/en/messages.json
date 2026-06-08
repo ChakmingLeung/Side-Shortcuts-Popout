@@ -3,9 +3,9 @@
     "message": "Side Shortcuts Popout"
   },
   "extDescription": {
-    "message": "Vertical web shortcuts in the side panel; click to open in a popout window alongside the main window."
+    "message": "Save sites in the side panel—one click opens a popout. Work in main window, browse in side window. Add links, backup supported. Local-only."
   },
   "actionTitle": {
-    "message": "Open / close Side Shortcuts Popout"
+    "message": "Open shortcuts menu"
   }
 }

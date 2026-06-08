@@ -1,204 +1,64 @@
-:root,
-[data-theme="light"] {
-  color-scheme: light;
-  --bg: #f5f6f8;
-  --surface: #ffffff;
-  --border: #e2e5ea;
-  --text: #1a1d23;
-  --text-muted: #5c6370;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --radius: 10px;
+:root {
   --toolbar-h: 44px;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  font-size: 14px;
 }
-
-[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #14171c;
-  --surface: #1e2229;
-  --border: #2d333d;
-  --text: #eef0f4;
-  --text-muted: #9aa3b2;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    color-scheme: dark;
-    --bg: #14171c;
-    --surface: #1e2229;
-    --border: #2d333d;
-    --text: #eef0f4;
-    --text-muted: #9aa3b2;
-    --accent: #3b82f6;
-    --accent-hover: #60a5fa;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  }
-}
-
-
-
-* {
-
-  box-sizing: border-box;
-
-}
-
-
 
 html,
-
 body {
-
   margin: 0;
-
   height: 100%;
-
   background: var(--bg);
-
   color: var(--text);
-
 }
-
-
 
 .app {
-
   display: flex;
-
   flex-direction: column;
-
   height: 100%;
-
   min-height: 0;
-
 }
-
-
 
 .toolbar {
-
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
-
   gap: 8px;
-
   height: var(--toolbar-h);
-
   padding: 0 12px;
-
   background: var(--surface);
-
   border-bottom: 1px solid var(--border);
-
   flex-shrink: 0;
-
 }
-
-
 
 .toolbar-title {
-
   margin: 0;
-
   font-size: 15px;
-
   font-weight: 600;
-
   min-width: 0;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
-
   white-space: nowrap;
-
+  flex: 1;
 }
 
-
-
-.icon-btn {
-
-  display: inline-flex;
-
+.toolbar-actions {
+  display: flex;
   align-items: center;
-
-  justify-content: center;
-
-  width: 32px;
-
-  height: 32px;
-
-  padding: 0;
-
-  border: none;
-
-  border-radius: 8px;
-
-  background: transparent;
-
-  color: var(--text-muted);
-
-  cursor: pointer;
-
+  gap: 4px;
   flex-shrink: 0;
-
 }
-
-
-
-.icon-btn:hover {
-
-  background: var(--bg);
-
-  color: var(--text);
-
-}
-
-
-
-.icon-btn svg {
-
-  width: 18px;
-
-  height: 18px;
-
-}
-
-
 
 .main {
-
   flex: 1;
-
   min-height: 0;
-
   overflow: auto;
-
   padding: 12px;
-
 }
 
-
-
 .hint {
-
   margin: 0 0 12px;
-
   font-size: 12px;
-
   line-height: 1.5;
-
   color: var(--text-muted);
-
 }
 
 .hint-pin {
@@ -209,178 +69,61 @@ body {
   border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
 }
 
+.hint-open-mode {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
 .shortcut-list {
-
-  list-style: none;
-
-  margin: 0;
-
-  padding: 0;
-
-  display: flex;
-
-  flex-direction: column;
-
   gap: 8px;
-
 }
-
-
-
-.shortcut-item {
-
-  margin: 0;
-
-}
-
-
 
 .shortcut-btn {
-
-  display: flex;
-
-  align-items: center;
-
   gap: 12px;
-
-  width: 100%;
-
   padding: 12px 14px;
-
   border: 1px solid var(--border);
-
   border-radius: var(--radius);
-
   background: var(--surface);
-
   box-shadow: var(--shadow);
-
-  color: var(--text);
-
-  font: inherit;
-
-  text-align: left;
-
-  cursor: pointer;
-
   transition: border-color 0.15s, transform 0.1s;
-
 }
-
-
 
 .shortcut-btn:hover {
-
   border-color: var(--accent);
-
 }
-
-
 
 .shortcut-btn:active {
-
   transform: scale(0.99);
-
 }
-
-
 
 .shortcut-btn.active {
-
   border-color: var(--accent);
-
   outline: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
-
-}
-
-
-
-.shortcut-icon-wrap {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.shortcut-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  object-fit: contain;
 }
 
 .shortcut-icon-fallback {
   font-size: 18px;
-  line-height: 1;
 }
-
-
 
 .shortcut-text {
-
   min-width: 0;
-
 }
-
-
 
 .shortcut-title {
-
   display: block;
-
   font-weight: 600;
-
   margin-bottom: 2px;
-
 }
-
-
 
 .shortcut-url {
-
   display: block;
-
   font-size: 11px;
-
   color: var(--text-muted);
-
   overflow: hidden;
-
   text-overflow: ellipsis;
-
   white-space: nowrap;
-
 }
-
-
 
 .empty-state {
-
-  text-align: center;
-
-  color: var(--text-muted);
-
   padding: 24px 8px;
-
 }
-
-
-
-.link-btn {
-
-  border: none;
-
-  background: none;
-
-  color: var(--accent);
-
-  font: inherit;
-
-  cursor: pointer;
-
-  text-decoration: underline;
-
-}
-
