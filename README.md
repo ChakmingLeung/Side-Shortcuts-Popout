@@ -10,24 +10,6 @@
 
 A browser extension that lists customizable web shortcuts in the native Chromium **Side Panel**—click to open in a **popout window** beside the main window, with normal cookies and login. Useful when [Microsoft Edge retires the built-in App Tower sidebar](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge).
 
----
-
-## Why not browse websites inside the side panel?
-
-Many users want to **read sites side-by-side in the panel**, like the old Edge sidebar. Early releases (v1.x) tried **iframe embedding**, but browser platform limits make that **unreliable and unfriendly**, so **v2.0.0+** uses a **shortcut list + popout window** instead.
-
-| Limitation | Explanation |
-|------------|-------------|
-| **Extension API** | The [Side Panel API](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) only loads extension pages (e.g. `sidepanel.html`), **not** arbitrary `https://` URLs—external sites must go in an **iframe**. |
-| **Cookie / login isolation** | Panel iframes use **different cookie partitions** than normal tabs, so you often get “logged in on tab, not in panel” or failed QR login; cookie injection workarounds are fragile and need extra permissions. |
-| **Sites block embedding** | Many sites set `X-Frame-Options` or CSP `frame-ancestors` to **refuse iframe embedding**; even if `declarativeNetRequest` strips headers, front-end code may detect `window.top !== window.self` and break login or QR codes. |
-| **Unlike Edge’s built-in sidebar** | Legacy Edge opened sites in a **separate top-level browsing context** with normal cookies and login; **extension iframes cannot match that**. |
-| **Maintenance & permissions** | Per-site allowlists, mobile UA, header rewriting, and cookie sync need broad permissions (`<all_urls>`, `cookies`, DNR) and still fail on strict login sites (e.g. Xiaohongshu). |
-
-**Our approach:** The panel shows a **vertical shortcut list only**; clicks open a **popout window** (a normal browser context) so login, QR codes, and payments behave like regular tabs. Under today’s Chromium extension model, this is the practical way to combine **sidebar shortcuts** with **real, usable browsing**.
-
----
-
 ## Features
 
 | Feature | Description |
@@ -91,6 +73,20 @@ Many users want to **read sites side-by-side in the panel**, like the old Edge s
 - Popups may be blocked by browser policy
 - **Resume** restores URL only, not scroll or form state; session clears when the browser closes
 - Popouts cannot be forced “always on top”
+
+## Why not browse websites inside the side panel?
+
+Many users want to **read sites side-by-side in the panel**, like the old Edge sidebar. Early releases (v1.x) tried **iframe embedding**, but browser platform limits make that **unreliable and unfriendly**, so **v2.0.0+** uses a **shortcut list + popout window** instead.
+
+| Limitation | Explanation |
+|------------|-------------|
+| **Extension API** | The [Side Panel API](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) only loads extension pages (e.g. `sidepanel.html`), **not** arbitrary `https://` URLs—external sites must go in an **iframe**. |
+| **Cookie / login isolation** | Panel iframes use **different cookie partitions** than normal tabs, so you often get “logged in on tab, not in panel” or failed QR login; cookie injection workarounds are fragile and need extra permissions. |
+| **Sites block embedding** | Many sites set `X-Frame-Options` or CSP `frame-ancestors` to **refuse iframe embedding**; even if `declarativeNetRequest` strips headers, front-end code may detect `window.top !== window.self` and break login or QR codes. |
+| **Unlike Edge’s built-in sidebar** | Legacy Edge opened sites in a **separate top-level browsing context** with normal cookies and login; **extension iframes cannot match that**. |
+| **Maintenance & permissions** | Per-site allowlists, mobile UA, header rewriting, and cookie sync need broad permissions (`<all_urls>`, `cookies`, DNR) and still fail on strict login sites (e.g. Xiaohongshu). |
+
+**Our approach:** The panel shows a **vertical shortcut list only**; clicks open a **popout window** (a normal browser context) so login, QR codes, and payments behave like regular tabs. Under today’s Chromium extension model, this is the practical way to combine **sidebar shortcuts** with **real, usable browsing**.
 
 ## Privacy
 

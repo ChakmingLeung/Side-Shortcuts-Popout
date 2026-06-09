@@ -10,24 +10,6 @@
 
 在 Microsoft Edge [逐步下线内置侧边栏 App Tower](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge) 的背景下，本扩展通过浏览器原生 **Side Panel（侧边栏）** API，纵向列出可配置的网页快捷入口；**点击即在独立小窗打开**，与主窗口并排浏览，登录态与常规标签页一致。
 
----
-
-## 为何不在侧栏里直接浏览网页？
-
-很多用户希望像旧版 Edge 侧栏那样，**在侧栏里并排看网页**。早期版本（v1.x）也曾尝试用 **iframe 内嵌** 实现，但受浏览器平台限制，**无法稳定、友好地复现**，自 **v2.0.0** 起改为「侧栏快捷列表 + 点击开小窗」。
-
-| 限制 | 说明 |
-|------|------|
-| **扩展 API** | [Side Panel](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) 只能加载扩展自己的页面（如 `sidepanel.html`），**不能**把侧栏直接设为 `https://…`；外站只能再套一层 **iframe**。 |
-| **Cookie / 登录隔离** | 侧栏 iframe 与常规标签页的 Cookie **分区不同**，常出现「标签页已登录、侧栏未登录」或扫码失败；靠注入 Cookie 等补丁脆弱且需额外权限。 |
-| **站点禁止嵌入** | 大量站点通过 `X-Frame-Options`、CSP `frame-ancestors` 等 **拒绝被 iframe 加载**；即使用 `declarativeNetRequest` 改响应头，仍可能被前端脚本检测 `window.top !== window.self` 而禁用登录/二维码。 |
-| **与 Edge 内置侧栏不同** | 旧版 Edge 侧栏由浏览器在 **独立顶层浏览上下文** 中打开网页，Cookie 与登录与正常窗口一致；**扩展 iframe 方案无法等价复现**。 |
-| **维护与权限成本** | 为少数可嵌站点维护白名单、移动 UA、去响应头、Cookie 同步等，权限面大（`<all_urls>`、`cookies`、DNR），仍难覆盖小红书等强登录场景。 |
-
-**本扩展的选择：** 侧栏只负责 **纵向展示快捷入口**；点击后用独立 **popout 小窗**（正常浏览器环境）打开，登录、扫码、支付与标签页行为一致。这是在当前 Chromium 扩展模型下，**兼顾「侧栏快捷」与「真实可用浏览」** 的可行方案。
-
----
-
 ## 功能亮点
 
 | 能力 | 说明 |
@@ -91,6 +73,20 @@
 - 小窗受浏览器弹窗策略限制；被拦截时请在站点权限中允许弹窗
 - **续看**仅恢复 URL，不保证滚动位置或未提交表单；关闭浏览器后 session 清空
 - 扩展无法将小窗设为「总在最前」
+
+## 为何不在侧栏里直接浏览网页？
+
+很多用户希望像旧版 Edge 侧栏那样，**在侧栏里并排看网页**。早期版本（v1.x）也曾尝试用 **iframe 内嵌** 实现，但受浏览器平台限制，**无法稳定、友好地复现**，自 **v2.0.0** 起改为「侧栏快捷列表 + 点击开小窗」。
+
+| 限制 | 说明 |
+|------|------|
+| **扩展 API** | [Side Panel](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) 只能加载扩展自己的页面（如 `sidepanel.html`），**不能**把侧栏直接设为 `https://…`；外站只能再套一层 **iframe**。 |
+| **Cookie / 登录隔离** | 侧栏 iframe 与常规标签页的 Cookie **分区不同**，常出现「标签页已登录、侧栏未登录」或扫码失败；靠注入 Cookie 等补丁脆弱且需额外权限。 |
+| **站点禁止嵌入** | 大量站点通过 `X-Frame-Options`、CSP `frame-ancestors` 等 **拒绝被 iframe 加载**；即使用 `declarativeNetRequest` 改响应头，仍可能被前端脚本检测 `window.top !== window.self` 而禁用登录/二维码。 |
+| **与 Edge 内置侧栏不同** | 旧版 Edge 侧栏由浏览器在 **独立顶层浏览上下文** 中打开网页，Cookie 与登录与正常窗口一致；**扩展 iframe 方案无法等价复现**。 |
+| **维护与权限成本** | 为少数可嵌站点维护白名单、移动 UA、去响应头、Cookie 同步等，权限面大（`<all_urls>`、`cookies`、DNR），仍难覆盖小红书等强登录场景。 |
+
+**本扩展的选择：** 侧栏只负责 **纵向展示快捷入口**；点击后用独立 **popout 小窗**（正常浏览器环境）打开，登录、扫码、支付与标签页行为一致。这是在当前 Chromium 扩展模型下，**兼顾「侧栏快捷」与「真实可用浏览」** 的可行方案。
 
 ## 隐私
 
