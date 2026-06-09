@@ -31,13 +31,13 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 
 ## 📥 Install
 
-###  Option 1: Microsoft Edge Add-ons (recommended)
+### Option 1: Microsoft Edge Add-ons (recommended)
 
 1. Open [Side Shortcuts Popout on Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ongipjlogkkpiolghmglnjjkjaddbgoa)
 2. Click **Get** / **Add extension**
 3. **Pin** the extension to the toolbar and open the side panel
 
-###  Option 2: Download Release (zip)
+### Option 2: Download Release (zip)
 
 1. Open [GitHub Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)
 2. Download the latest **`Side-Shortcuts-Popout-v*.zip`**
@@ -45,7 +45,7 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 4. **Edge:** `edge://extensions/` → **Developer mode** → **Load unpacked** → select the unzipped folder  
    **Chrome:** `chrome://extensions/` → **Developer mode** → **Load unpacked** → select the unzipped folder
 
-> An “unverified extension” notice is normal when loading from a Release zip.
+> An “unverified extension” notice is normal when loading from a Release zip or source.
 
 ### First run
 
@@ -59,7 +59,7 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 |--------|--------|
 | Normal click | Open popout; after close, restore last URL in this session when possible |
 | Click while popout open | Focus only, no reload |
-| **Shift+click** / **Open from start** | Load configured start URL |
+| **Shift+click** / **right-click Open from start** | Load configured start URL |
 
 ## 📱 Mobile / desktop
 
@@ -70,7 +70,7 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 
 ## ⚠️ Known limitations
 
-- Popups may be blocked by browser policy
+- Popups may be blocked by browser policy; if blocked, allow popups in the site’s permissions
 - **Resume** restores URL only, not scroll or form state; session clears when the browser closes
 - Popouts cannot be forced “always on top”
 
