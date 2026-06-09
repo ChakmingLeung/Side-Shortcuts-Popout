@@ -1,6 +1,7 @@
 # 侧栏快捷小窗 · Side Shortcuts Popout
 
-**语言 / Language:** [简体中文](README.zh-CN.md) · [English](README.md)
+**语言 / Language:** [简体中文](README.zh-CN.md) · [English](README.md)  
+**更新日志 / Changelog:** [CHANGELOG.md](CHANGELOG.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
