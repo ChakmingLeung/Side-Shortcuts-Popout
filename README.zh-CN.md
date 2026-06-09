@@ -1,4 +1,4 @@
-# 🪟 侧栏快捷小窗 · Side Shortcuts Popout
+# 侧栏快捷小窗 · Side Shortcuts Popout
 
 **语言 / Language:** [简体中文](README.zh-CN.md) · [English](README.md)
 
@@ -31,13 +31,13 @@
 
 ## 📥 安装
 
-### 🏪 方式一：Edge 加载项商店（推荐）
+###  方式一：Edge 加载项商店（推荐）
 
 1. 打开 [Edge 加载项 · Side Shortcuts Popout](https://microsoftedge.microsoft.com/addons/detail/ongipjlogkkpiolghmglnjjkjaddbgoa)
 2. 点击 **获取** / **添加扩展**
 3. 将扩展 **固定到工具栏**，点击图标打开侧栏
 
-### 📦 方式二：下载 Release（zip）
+###  方式二：下载 Release（zip）
 
 1. 打开 [GitHub Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)
 2. 下载最新版 **`Side-Shortcuts-Popout-v*.zip`**
@@ -47,7 +47,7 @@
 
 > 从 Release 或源码加载时，浏览器可能提示「未经验证的扩展」，属正常现象。
 
-### 🚀 首次使用
+###  首次使用
 
 1. 首次安装预置 9 个常用入口，可在 **选项** 页修改
 2. 点击侧栏入口在小窗打开；右上角 **齿轮** 进入设置
