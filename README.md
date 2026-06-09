@@ -1,4 +1,4 @@
-# Side Shortcuts Popout
+# 🪟 Side Shortcuts Popout
 
 **Language / 语言:** [English](README.md) · [简体中文](README.zh-CN.md)
 
@@ -10,7 +10,7 @@
 
 A browser extension that lists customizable web shortcuts in the native Chromium **Side Panel**—click to open in a **popout window** beside the main window, with normal cookies and login. Useful when [Microsoft Edge retires the built-in App Tower sidebar](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge).
 
-## Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
@@ -25,19 +25,19 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 | Sync | Optional `chrome.storage.sync` when signed in |
 | Locale | English / 简体中文 / follow browser |
 
-## Requirements
+## 💻 Requirements
 
 - **Microsoft Edge 114+** or **Google Chrome 114+**
 
-## Install
+## 📥 Install
 
-### Option 1: Microsoft Edge Add-ons (recommended)
+### 🏪 Option 1: Microsoft Edge Add-ons (recommended)
 
 1. Open [Side Shortcuts Popout on Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ongipjlogkkpiolghmglnjjkjaddbgoa)
 2. Click **Get** / **Add extension**
 3. **Pin** the extension to the toolbar and open the side panel
 
-### Option 2: Download Release (zip)
+### 📦 Option 2: Download Release (zip)
 
 1. Open [GitHub Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)
 2. Download the latest **`Side-Shortcuts-Popout-v*.zip`**
@@ -47,13 +47,13 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 
 > An “unverified extension” notice is normal when loading from a Release zip.
 
-### First run
+### 🚀 First run
 
 1. Nine preset shortcuts on first install; edit in **Options**
 2. Click a shortcut to open a popout; use the gear icon for settings
 3. **Export** your config before uninstall or device change
 
-## Popout tips
+## 🖱️ Popout tips
 
 | Action | Effect |
 |--------|--------|
@@ -61,14 +61,14 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 | Click while popout open | Focus only, no reload |
 | **Shift+click** / **Open from start** | Load configured start URL |
 
-## Mobile / desktop
+## 📱 Mobile / desktop
 
 - Stored **URL is never rewritten** by the extension
 - **Mobile:** ~375px wide, Android UA + viewport
 - **Desktop:** ~420px wide, native UA
 - Use mobile URLs yourself when needed (e.g. `https://m.weibo.cn/`)
 
-## Known limitations
+## ⚠️ Known limitations
 
 - Popups may be blocked by browser policy
 - **Resume** restores URL only, not scroll or form state; session clears when the browser closes
@@ -94,14 +94,14 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 
 ---
 
-## Privacy
+## 🔒 Privacy
 
 Only your shortcut list is stored locally and optionally synced with your browser account. No browsing history or page content is collected.
 
-## License
+## 📄 License
 
 [MIT License](LICENSE) © 2026
 
-## Disclaimer
+## ℹ️ Disclaimer
 
 Not affiliated with Microsoft or Google.
