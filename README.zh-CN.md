@@ -6,8 +6,25 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
+[![Version](https://img.shields.io/badge/version-2.5.3-blue.svg)](CHANGELOG.md)
 
 在 Microsoft Edge [逐步下线内置侧边栏 App Tower](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge) 的背景下，本扩展通过浏览器原生 **Side Panel（侧边栏）** API，纵向列出可配置的网页快捷入口；**点击即在独立小窗打开**，与主窗口并排浏览，登录态与常规标签页一致。
+
+---
+
+## 为何不在侧栏里直接浏览网页？
+
+很多用户希望像旧版 Edge 侧栏那样，**在侧栏里并排看网页**。早期版本（v1.x）也曾尝试用 **iframe 内嵌** 实现，但受浏览器平台限制，**无法稳定、友好地复现**，自 **v2.0.0** 起改为「侧栏快捷列表 + 点击开小窗」。
+
+| 限制 | 说明 |
+|------|------|
+| **扩展 API** | [Side Panel](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) 只能加载扩展自己的页面（如 `sidepanel.html`），**不能**把侧栏直接设为 `https://…`；外站只能再套一层 **iframe**。 |
+| **Cookie / 登录隔离** | 侧栏 iframe 与常规标签页的 Cookie **分区不同**，常出现「标签页已登录、侧栏未登录」或扫码失败；靠注入 Cookie 等补丁脆弱且需额外权限。 |
+| **站点禁止嵌入** | 大量站点通过 `X-Frame-Options`、CSP `frame-ancestors` 等 **拒绝被 iframe 加载**；即使用 `declarativeNetRequest` 改响应头，仍可能被前端脚本检测 `window.top !== window.self` 而禁用登录/二维码。 |
+| **与 Edge 内置侧栏不同** | 旧版 Edge 侧栏由浏览器在 **独立顶层浏览上下文** 中打开网页，Cookie 与登录与正常窗口一致；**扩展 iframe 方案无法等价复现**。 |
+| **维护与权限成本** | 为少数可嵌站点维护白名单、移动 UA、去响应头、Cookie 同步等，权限面大（`<all_urls>`、`cookies`、DNR），仍难覆盖小红书等强登录场景。 |
+
+**本扩展的选择：** 侧栏只负责 **纵向展示快捷入口**；点击后用独立 **popout 小窗**（正常浏览器环境）打开，登录、扫码、支付与标签页行为一致。这是在当前 Chromium 扩展模型下，**兼顾「侧栏快捷」与「真实可用浏览」** 的可行方案。
 
 ---
 
@@ -32,14 +49,21 @@
 
 ## 安装
 
-### 从源码加载（开发者模式）
+### 方式一：Edge 加载项商店（推荐）
 
-1. 克隆或下载本仓库
-2. **Edge：** `edge://extensions/` → 开启 **开发人员模式** → **加载解压缩的扩展** → 选择项目根目录（含 `manifest.json`）
-3. **Chrome：** `chrome://extensions/` → 开启 **开发者模式** → **加载已解压的扩展程序** → 选择项目根目录
-4. 将扩展 **固定到工具栏**，点击图标打开侧栏
+1. 打开 [Edge 加载项 · Side Shortcuts Popout](https://microsoftedge.microsoft.com/addons/detail/ongipjlogkkpiolghmglnjjkjaddbgoa)
+2. 点击 **获取** / **添加扩展**
+3. 将扩展 **固定到工具栏**，点击图标打开侧栏
 
-> 开发者模式加载时，浏览器可能提示「未经验证的扩展」，属正常现象。
+### 方式二：下载 Release（zip）
+
+1. 打开 [GitHub Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)
+2. 下载最新版 **`Side-Shortcuts-Popout-v*.zip`**
+3. 解压到任意文件夹（根目录应含 `manifest.json`）
+4. **Edge：** `edge://extensions/` → **开发人员模式** → **加载解压缩的扩展** → 选中解压后的文件夹  
+   **Chrome：** `chrome://extensions/` → **开发者模式** → **加载已解压的扩展程序** → 选中解压后的文件夹
+
+> 从 Release 或源码加载时，浏览器可能提示「未经验证的扩展」，属正常现象。
 
 ### 首次使用
 

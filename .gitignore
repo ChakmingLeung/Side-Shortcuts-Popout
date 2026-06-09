@@ -29,7 +29,6 @@ npm-debug.log*
 /scripts/
 /.github/
 AGENTS.md
-CHANGELOG.md
 CONTRIBUTING.md
 CONTRIBUTING.zh-CN.md
 /icons/source.png

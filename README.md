@@ -6,8 +6,25 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
+[![Version](https://img.shields.io/badge/version-2.5.3-blue.svg)](CHANGELOG.md)
 
 A browser extension that lists customizable web shortcuts in the native Chromium **Side Panel**—click to open in a **popout window** beside the main window, with normal cookies and login. Useful when [Microsoft Edge retires the built-in App Tower sidebar](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge).
+
+---
+
+## Why not browse websites inside the side panel?
+
+Many users want to **read sites side-by-side in the panel**, like the old Edge sidebar. Early releases (v1.x) tried **iframe embedding**, but browser platform limits make that **unreliable and unfriendly**, so **v2.0.0+** uses a **shortcut list + popout window** instead.
+
+| Limitation | Explanation |
+|------------|-------------|
+| **Extension API** | The [Side Panel API](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) only loads extension pages (e.g. `sidepanel.html`), **not** arbitrary `https://` URLs—external sites must go in an **iframe**. |
+| **Cookie / login isolation** | Panel iframes use **different cookie partitions** than normal tabs, so you often get “logged in on tab, not in panel” or failed QR login; cookie injection workarounds are fragile and need extra permissions. |
+| **Sites block embedding** | Many sites set `X-Frame-Options` or CSP `frame-ancestors` to **refuse iframe embedding**; even if `declarativeNetRequest` strips headers, front-end code may detect `window.top !== window.self` and break login or QR codes. |
+| **Unlike Edge’s built-in sidebar** | Legacy Edge opened sites in a **separate top-level browsing context** with normal cookies and login; **extension iframes cannot match that**. |
+| **Maintenance & permissions** | Per-site allowlists, mobile UA, header rewriting, and cookie sync need broad permissions (`<all_urls>`, `cookies`, DNR) and still fail on strict login sites (e.g. Xiaohongshu). |
+
+**Our approach:** The panel shows a **vertical shortcut list only**; clicks open a **popout window** (a normal browser context) so login, QR codes, and payments behave like regular tabs. Under today’s Chromium extension model, this is the practical way to combine **sidebar shortcuts** with **real, usable browsing**.
 
 ---
 
@@ -30,14 +47,23 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 
 - **Microsoft Edge 114+** or **Google Chrome 114+**
 
-## Install (load unpacked)
+## Install
 
-1. Clone or download this repository
-2. **Edge:** `edge://extensions/` → **Developer mode** → **Load unpacked** → select the repo root (folder containing `manifest.json`)
-3. **Chrome:** `chrome://extensions/` → **Developer mode** → **Load unpacked** → select the repo root
-4. **Pin** the extension to the toolbar and open the side panel
+### Option 1: Microsoft Edge Add-ons (recommended)
 
-> An “unverified extension” notice is normal in developer mode.
+1. Open [Side Shortcuts Popout on Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ongipjlogkkpiolghmglnjjkjaddbgoa)
+2. Click **Get** / **Add extension**
+3. **Pin** the extension to the toolbar and open the side panel
+
+### Option 2: Download Release (zip)
+
+1. Open [GitHub Releases](https://github.com/ChakmingLeung/Side-Shortcuts-Popout/releases)
+2. Download the latest **`Side-Shortcuts-Popout-v*.zip`**
+3. Unzip to any folder (the folder root must contain `manifest.json`)
+4. **Edge:** `edge://extensions/` → **Developer mode** → **Load unpacked** → select the unzipped folder  
+   **Chrome:** `chrome://extensions/` → **Developer mode** → **Load unpacked** → select the unzipped folder
+
+> An “unverified extension” notice is normal when loading from a Release zip.
 
 ### First run
 
