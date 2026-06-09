@@ -74,9 +74,12 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 - **Resume** restores URL only, not scroll or form state; session clears when the browser closes
 - Popouts cannot be forced “always on top”
 
-## Why not browse websites inside the side panel?
+---
 
-Many users want to **read sites side-by-side in the panel**, like the old Edge sidebar. Early releases (v1.x) tried **iframe embedding**, but browser platform limits make that **unreliable and unfriendly**, so **v2.0.0+** uses a **shortcut list + popout window** instead.
+## 📌 FAQ: Why not browse websites inside the side panel?
+
+> [!IMPORTANT]
+> Many users want to **read sites side-by-side in the panel**, like the old Edge sidebar. Early releases (v1.x) tried **iframe embedding**, but browser platform limits make that **unreliable and unfriendly**, so **v2.0.0+** uses a **shortcut list + popout window** instead. The table below summarizes the main platform constraints:
 
 | Limitation | Explanation |
 |------------|-------------|
@@ -86,7 +89,10 @@ Many users want to **read sites side-by-side in the panel**, like the old Edge s
 | **Unlike Edge’s built-in sidebar** | Legacy Edge opened sites in a **separate top-level browsing context** with normal cookies and login; **extension iframes cannot match that**. |
 | **Maintenance & permissions** | Per-site allowlists, mobile UA, header rewriting, and cookie sync need broad permissions (`<all_urls>`, `cookies`, DNR) and still fail on strict login sites (e.g. Xiaohongshu). |
 
-**Our approach:** The panel shows a **vertical shortcut list only**; clicks open a **popout window** (a normal browser context) so login, QR codes, and payments behave like regular tabs. Under today’s Chromium extension model, this is the practical way to combine **sidebar shortcuts** with **real, usable browsing**.
+> [!IMPORTANT]
+> **Our approach:** The panel shows a **vertical shortcut list only**; clicks open a **popout window** (a normal browser context) so login, QR codes, and payments behave like regular tabs. Under today’s Chromium extension model, this is the practical way to combine **sidebar shortcuts** with **real, usable browsing**.
+
+---
 
 ## Privacy
 
