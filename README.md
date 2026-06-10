@@ -21,7 +21,7 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 | Open from start | **Shift+click** or context **Open from start URL** |
 | Mobile / desktop | Per-entry; mobile uses Android UA + 375px + viewport |
 | Launcher mode | **Side panel list** or **toolbar popup menu** |
-| Open mode | Default **Popout** (recommended); **not recommended** for daily use: experimental **Side panel embed** |
+| Open mode | Default **Popout** (recommended); **not recommended** for daily use: experimental **open page in side panel** |
 | Theme | Light / dark / follow system |
 | Backup | Export / import JSON |
 | Sync | Optional `chrome.storage.sync` when signed in |
@@ -63,15 +63,23 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 | Click while popout open | Focus only, no reload |
 | **Shift+click** / **right-click Open from start** | Load configured start URL |
 
-The side panel list includes **usage tips** below the shortcuts. With **Side panel embed** enabled, popup menu clicks open sites in a side-panel iframe; the toolbar icon stays on the popup menu.
+The side panel list includes **usage tips** below the shortcuts. With **open page in side panel** enabled, popup menu clicks open sites in a side-panel iframe; the toolbar icon stays on the popup menu.
 
-## 🧪 Side panel embed (experimental, v2.6.0)
+## 🧪 Open page in side panel (experimental, v2.6.0)
 
 > [!WARNING]
-> **Not recommended.** This is experimental: browser APIs and site policies make **failures common and behavior unreliable**. Keep the default **Popout**. Only try embed briefly if you must; switch back to Popout when anything goes wrong.
+> **Not recommended.** This is experimental: browser APIs and site policies make **failures common and behavior unreliable**. Keep the default **Popout**. Only try briefly if you must; switch back to Popout when anything goes wrong. Default iframe was dropped in **v2.0.0** for the same class of issues; the main path remains **shortcut list + popout**.
 
 - **Options → Open mode → Side panel** opens sites in a full-screen iframe via the toolbar **popup menu** (toolbar stays on popup menu in this mode)
-- The `!` hint in Settings says the same; use **Open in popout** on embed failure; embed has **no** popout-style URL resume
+- The `!` hint in Settings says the same; use **Open in popout** on failure; this mode has **no** popout-style URL resume
+
+| Limitation | Explanation |
+|------------|-------------|
+| **Extension API** | The [Side Panel API](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) only loads extension pages (e.g. `sidepanel.html`), **not** arbitrary `https://` URLs—external sites must go in an **iframe**. |
+| **Cookie / login isolation** | Panel iframes use **different cookie partitions** than normal tabs, so you often get “logged in on tab, not in panel” or failed QR login; cookie injection workarounds are fragile and need extra permissions. |
+| **Sites block embedding** | Many sites set `X-Frame-Options` or CSP `frame-ancestors` to **refuse iframe embedding**; even if `declarativeNetRequest` strips headers, front-end code may detect `window.top !== window.self` and break login or QR codes. |
+| **Unlike Edge’s built-in sidebar** | Legacy Edge opened sites in a **separate top-level browsing context** with normal cookies and login; **extension iframes cannot match that**. |
+| **Maintenance & permissions** | Per-site allowlists, mobile UA, header rewriting, and cookie sync need broad permissions (`<all_urls>`, `cookies`, DNR) and still fail on strict login sites (e.g. Xiaohongshu). |
 
 ## 📱 Mobile / desktop
 
@@ -85,23 +93,6 @@ The side panel list includes **usage tips** below the shortcuts. With **Side pan
 - Popups may be blocked by browser policy; if blocked, allow popups in the site’s permissions
 - **Resume** restores URL only, not scroll or form state; session clears when the browser closes
 - Popouts cannot be forced “always on top”
-
----
-
-## 📌 FAQ: Side panel embed vs popout
-
-> [!WARNING]
-> **Strongly prefer Popout** (separate window, reliable login and resume). **Side panel embed is not recommended for everyday use**—all limits below still apply in the v2.6.0 experiment. The main path since **v2.0.0** is **shortcut list + popout** (default iframe was dropped in v2.0.0 for the same class of issues).
-
-| Limitation | Explanation |
-|------------|-------------|
-| **Extension API** | The [Side Panel API](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) only loads extension pages (e.g. `sidepanel.html`), **not** arbitrary `https://` URLs—external sites must go in an **iframe**. |
-| **Cookie / login isolation** | Panel iframes use **different cookie partitions** than normal tabs, so you often get “logged in on tab, not in panel” or failed QR login; cookie injection workarounds are fragile and need extra permissions. |
-| **Sites block embedding** | Many sites set `X-Frame-Options` or CSP `frame-ancestors` to **refuse iframe embedding**; even if `declarativeNetRequest` strips headers, front-end code may detect `window.top !== window.self` and break login or QR codes. |
-| **Unlike Edge’s built-in sidebar** | Legacy Edge opened sites in a **separate top-level browsing context** with normal cookies and login; **extension iframes cannot match that**. |
-| **Maintenance & permissions** | Per-site allowlists, mobile UA, header rewriting, and cookie sync need broad permissions (`<all_urls>`, `cookies`, DNR) and still fail on strict login sites (e.g. Xiaohongshu). |
-
----
 
 ## 🔒 Privacy
 
