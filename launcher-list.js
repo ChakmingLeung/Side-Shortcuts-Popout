@@ -217,10 +217,13 @@ export async function initLauncherList({
       shouldHandleStorageUpdate(area, "settings", changes.settings.newValue)
     ) {
       const settings = changes.settings.newValue;
+      const prev = changes.settings.oldValue ?? {};
       if (settings.theme !== undefined) applyTheme(settings.theme);
-      await initI18n();
-      applyDocumentI18n();
-      applyToolbarI18n();
+      if (settings.locale !== prev.locale) {
+        await initI18n();
+        applyDocumentI18n();
+        applyToolbarI18n();
+      }
     }
 
     if (isSidebar && changes.lastShortcutId) {
@@ -255,5 +258,5 @@ export async function initLauncherList({
     shortcutsCache = await getShortcuts();
   }
   renderShortcuts(shortcutsCache);
-  return { handleStorageChange };
+  return { handleStorageChange, showOpenError };
 }

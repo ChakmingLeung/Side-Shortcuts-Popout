@@ -1,12 +1,9 @@
-import { getSettings, saveSettings, normalizeLauncherMode, isSidebarEmbedOpenMode } from "./shared.js";
-import { resolveBrowserWindowIdForSidePanel } from "./sidebar-embed.js";
+import { getSettings, saveSettings, normalizeLauncherMode, isSidebarEmbedOpenMode, resolveLauncherMode } from "./shared.js";
+import { resolveBrowserWindowIdForSidePanel } from "./browser-window.js";
 
 const POPUP_PATH = "popup.html";
 
-export function resolveLauncherMode(settings) {
-  if (isSidebarEmbedOpenMode(settings)) return "menu";
-  return normalizeLauncherMode(settings?.launcherMode);
-}
+export { resolveLauncherMode };
 
 export function syncLauncherModeSelect(select, settings) {
   if (!select) return;
@@ -45,9 +42,47 @@ export async function recordLauncherMode(mode) {
   return next;
 }
 
+/** 在 Service Worker 中持久化并应用工具栏模式（避免侧栏/弹窗页与 SW 缓存竞态） */
+export async function persistAndApplyLauncherMode(mode) {
+  const requested = normalizeLauncherMode(mode);
+  const settings = await getSettings();
+
+  if (isSidebarEmbedOpenMode(settings) && requested !== "menu") {
+    return { ok: false, error: "embed_mode" };
+  }
+
+  const applied = resolveLauncherMode({
+    ...settings,
+    launcherMode: isSidebarEmbedOpenMode(settings) ? "menu" : requested,
+  });
+
+  settings.launcherMode = applied;
+  await saveSettings(settings);
+  await applyLauncherMode(applied);
+  return { ok: true, mode: applied };
+}
+
 /** Side panel → menu mode (best-effort openPopup, then close side panel). */
 export async function switchToMenuFromSidepanel() {
   const windowId = await resolveBrowserWindowIdForSidePanel();
+
+  let res;
+  try {
+    res = await chrome.runtime.sendMessage({ type: "SET_LAUNCHER_MODE", mode: "menu" });
+  } catch {
+    res = null;
+  }
+  if (!res?.ok) {
+    await recordLauncherMode("menu");
+    try {
+      res = await chrome.runtime.sendMessage({ type: "SET_LAUNCHER_MODE", mode: "menu" });
+    } catch {
+      res = null;
+    }
+    if (!res?.ok) {
+      await requestLauncherSyncFromBackground();
+    }
+  }
 
   if (windowId != null) {
     try {
@@ -55,12 +90,6 @@ export async function switchToMenuFromSidepanel() {
     } catch {
       /* user gesture or popup unavailable */
     }
-  }
-
-  await recordLauncherMode("menu");
-  await applyLauncherMode("menu");
-
-  if (windowId != null) {
     try {
       await chrome.sidePanel.close({ windowId });
     } catch {
@@ -74,19 +103,39 @@ export async function switchToMenuFromSidepanel() {
 /** Popup → side panel list, then close popup. */
 export async function switchToSidebarFromPopup() {
   const settings = await getSettings();
-  if (isSidebarEmbedOpenMode(settings)) return;
+  if (isSidebarEmbedOpenMode(settings)) {
+    return { ok: false, error: "embed_mode" };
+  }
 
   const windowId = await resolveBrowserWindowIdForSidePanel();
-  if (windowId == null) return;
+  if (windowId == null) {
+    return { ok: false, error: "no_window" };
+  }
 
-  await recordLauncherMode("sidebar");
-  await applyLauncherMode("sidebar");
+  let res;
+  try {
+    res = await chrome.runtime.sendMessage({ type: "SET_LAUNCHER_MODE", mode: "sidebar" });
+  } catch {
+    res = null;
+  }
+  if (!res?.ok) {
+    await recordLauncherMode("sidebar");
+    try {
+      res = await chrome.runtime.sendMessage({ type: "SET_LAUNCHER_MODE", mode: "sidebar" });
+    } catch {
+      res = null;
+    }
+    if (!res?.ok) {
+      await requestLauncherSyncFromBackground();
+    }
+  }
 
   try {
     await chrome.sidePanel.open({ windowId });
   } catch {
-    /* user gesture or panel unavailable */
+    return { ok: false, error: "open_failed" };
   }
 
   window.close();
+  return { ok: true };
 }

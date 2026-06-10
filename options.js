@@ -28,8 +28,6 @@ import {
 import { initTheme, syncThemeSelect, setThemePreference, applyTheme } from "./theme.js";
 import {
   syncLauncherModeSelect,
-  applyLauncherMode,
-  applyLauncherModeFromSettings,
   requestLauncherSyncFromBackground,
 } from "./launcher.js";
 import {
@@ -404,23 +402,12 @@ function syncPopoutOpenModeUi(settings) {
   }
 }
 
-async function applyLauncherFromSettings(settings) {
-  if (isSidebarEmbedOpenMode(settings)) {
-    await applyLauncherMode("menu");
-  } else {
-    await applyLauncherModeFromSettings(settings);
-  }
-}
-
 async function loadSettings() {
   const settings = await getSettings();
   syncLanguageSelect(languageSelect, settings);
   syncThemeSelect(themeSelect, settings);
   syncPopoutOpenModeUi(settings);
-  await applyLauncherFromSettings(settings);
-  if (isSidebarEmbedOpenMode(settings)) {
-    await requestLauncherSyncFromBackground();
-  }
+  await requestLauncherSyncFromBackground();
 }
 
 themeSelect.addEventListener("change", async () => {
@@ -432,7 +419,7 @@ launcherModeSelect?.addEventListener("change", async () => {
   const settings = await getSettings();
   settings.launcherMode = normalizeLauncherMode(launcherModeSelect.value);
   await saveSettings(settings);
-  await applyLauncherMode(settings.launcherMode);
+  await requestLauncherSyncFromBackground();
 });
 
 popoutOpenModeRadios.forEach((radio) => {
@@ -447,7 +434,6 @@ popoutOpenModeRadios.forEach((radio) => {
     }
     await saveSettings(settings);
     syncPopoutOpenModeUi(settings);
-    await applyLauncherFromSettings(settings);
     await requestLauncherSyncFromBackground();
   });
 });
@@ -595,15 +581,14 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
     if (settings.theme !== undefined) applyTheme(settings.theme);
     syncThemeSelect(themeSelect, settings);
     syncPopoutOpenModeUi(settings);
+    syncLanguageSelect(languageSelect, settings);
     if (shouldSyncLauncherFromSettingsChange(prev, changes.settings.newValue)) {
-      await applyLauncherFromSettings(settings);
       await requestLauncherSyncFromBackground();
     }
-    await initI18n();
-    syncLanguageSelect(languageSelect, settings);
-    applyOptionsI18n();
-    applyAuthorFooter();
     if (settings.locale !== prev.locale) {
+      await initI18n();
+      applyOptionsI18n();
+      applyAuthorFooter();
       await refresh();
     }
   }

@@ -6,8 +6,10 @@ import {
   saveSettings,
   isSidebarEmbedOpenMode,
   applyPopoutOpenModeToSettings,
+  resolveLauncherMode,
   shouldHandleStorageUpdate,
   shouldSyncLauncherFromSettingsChange,
+  normalizeStoredSettings,
   ensureLocalShortcutsCache,
   ensureLocalSettingsCache,
   hasStoredSettings,
@@ -28,7 +30,7 @@ import {
   syncOpenEmbedIfChanged,
 } from "./sidebar-embed.js";
 import { clearResumeOnUrlChange, pruneResumeUrls } from "./popout-resume.js";
-import { applyLauncherMode, applyLauncherModeFromSettings, resolveLauncherMode } from "./launcher.js";
+import { applyLauncherMode, applyLauncherModeFromSettings, persistAndApplyLauncherMode } from "./launcher.js";
 import { registerContextMenu, setupContextMenuListener } from "./context-menu.js";
 import { syncEmbedMobileUa, handleMobileNavigationCommitted } from "./mobile-ua.js";
 
@@ -48,8 +50,17 @@ async function updateActionTitle() {
   await registerContextMenu();
 }
 
-async function syncLauncherFromSettings(prevSettings) {
-  let settings = await getSettings();
+async function getActionPinnedToToolbar() {
+  try {
+    const { isOnToolbar } = await chrome.action.getUserSettings();
+    return Boolean(isOnToolbar);
+  } catch {
+    return true;
+  }
+}
+
+async function syncLauncherFromSettings(prevSettings, nextRaw) {
+  let settings = nextRaw ? normalizeStoredSettings(nextRaw) : await getSettings();
 
   if (prevSettings) {
     const wasEmbed = isSidebarEmbedOpenMode(prevSettings);
@@ -83,6 +94,23 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     syncLauncherFromSettings()
       .then(() => sendResponse({ ok: true }))
       .catch((err) => sendResponse({ ok: false, error: String(err) }));
+    return true;
+  }
+
+  if (message?.type === "SET_LAUNCHER_MODE") {
+    persistAndApplyLauncherMode(message.mode)
+      .then(async (result) => {
+        if (result.ok) await updateActionTitle();
+        sendResponse(result);
+      })
+      .catch((err) => sendResponse({ ok: false, error: String(err) }));
+    return true;
+  }
+
+  if (message?.type === "GET_ACTION_PINNED") {
+    getActionPinnedToToolbar()
+      .then((pinned) => sendResponse({ ok: true, pinned }))
+      .catch(() => sendResponse({ ok: true, pinned: true }));
     return true;
   }
 
@@ -167,7 +195,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
       const next = changes.settings.newValue;
       const prev = changes.settings.oldValue ?? {};
       if (shouldSyncLauncherFromSettingsChange(prev, next)) {
-        syncLauncherFromSettings(prev).catch(() => {});
+        syncLauncherFromSettings(prev, next).catch(() => {});
       } else if (next.locale !== prev?.locale) {
         updateActionTitle().catch(() => {});
       }

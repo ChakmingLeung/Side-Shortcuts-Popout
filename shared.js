@@ -63,6 +63,12 @@ export function normalizeLauncherMode(value) {
   return value === "sidebar" ? "sidebar" : "menu";
 }
 
+/** 工具栏实际模式（embed 实验模式强制 popup 菜单） */
+export function resolveLauncherMode(settings) {
+  if (isSidebarEmbedOpenMode(settings)) return "menu";
+  return normalizeLauncherMode(settings?.launcherMode);
+}
+
 const DEFAULT_FAVICON_FALLBACK = "🔗";
 
 async function storageSet(key, value) {
@@ -76,6 +82,8 @@ async function storageSet(key, value) {
 
 /** local+sync 双写时跳过 sync 回声的重复处理 */
 const localStorageEcho = new Map();
+/** sync 回声：同一 signature 在多个 listener 中只跳过一次 */
+const skipSyncSignatures = new Map();
 
 /** 进程内 storage 读缓存（各页面/SW 独立，onChanged 时失效） */
 const storageCache = {
@@ -85,16 +93,22 @@ const storageCache = {
 };
 
 function mergeSettings(localVal, syncVal) {
-  const merged = { ...DEFAULT_SETTINGS, ...localVal, ...syncVal };
+  // sync 先合并，local 覆盖 — 本机刚写入的 local 优先于尚未同步完成的旧 sync
+  const merged = { ...DEFAULT_SETTINGS, ...syncVal, ...localVal };
+  merged.popoutOpenMode = normalizePopoutOpenMode(merged);
+  return merged;
+}
+
+export function normalizeStoredSettings(raw) {
+  const merged = { ...DEFAULT_SETTINGS, ...(raw && typeof raw === "object" ? raw : {}) };
   merged.popoutOpenMode = normalizePopoutOpenMode(merged);
   return merged;
 }
 
 function mergeShortcuts(syncList, localList) {
-  if (Array.isArray(syncList) && syncList.length > 0) return syncList;
-  if (Array.isArray(localList) && localList.length > 0) return localList;
-  if (Array.isArray(syncList)) return syncList;
+  // local 为数组时优先（含空数组），与 mergeSettings 一致，避免 sync 写入失败时读到旧列表
   if (Array.isArray(localList)) return localList;
+  if (Array.isArray(syncList)) return syncList;
   return [];
 }
 
@@ -117,14 +131,18 @@ export function shouldHandleStorageUpdate(area, key, newValue) {
   const signature = JSON.stringify(newValue ?? null);
   if (area === "local") {
     localStorageEcho.set(key, signature);
+    skipSyncSignatures.delete(key);
     return true;
   }
   if (area === "sync") {
     if (localStorageEcho.get(key) === signature) {
       localStorageEcho.delete(key);
+      skipSyncSignatures.set(key, signature);
       return false;
     }
-    localStorageEcho.set(key, signature);
+    if (skipSyncSignatures.get(key) === signature) {
+      return false;
+    }
     return true;
   }
   return true;
@@ -157,8 +175,8 @@ async function readShortcutsFromAreas() {
 /** 是否已有用户保存的快捷入口（sync 已有该键、或 local 有条目 → 不写预置） */
 export async function hasSavedShortcuts() {
   const { syncVal, localVal } = await readFromAreas(STORAGE_KEY);
-  if (Array.isArray(syncVal)) return true;
-  if (Array.isArray(localVal) && localVal.length > 0) return true;
+  if (Array.isArray(localVal)) return true;
+  if (Array.isArray(syncVal) && syncVal.length > 0) return true;
   return false;
 }
 
@@ -229,7 +247,7 @@ export async function getSettings() {
 
 export async function saveSettings(settings) {
   await storageSet(SETTINGS_KEY, settings);
-  storageCache.settings = mergeSettings(null, settings);
+  storageCache.settings = normalizeStoredSettings(settings);
 }
 
 export function escapeHtml(str) {
