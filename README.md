@@ -7,7 +7,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.5.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](CHANGELOG.md)
 
 A browser extension that lists customizable web shortcuts in the native Chromium **Side Panel**—click to open in a **popout window** beside the main window, with normal cookies and login. Useful when [Microsoft Edge retires the built-in App Tower sidebar](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge).
 
@@ -21,6 +21,7 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 | Open from start | **Shift+click** or context **Open from start URL** |
 | Mobile / desktop | Per-entry; mobile uses Android UA + 375px + viewport |
 | Launcher mode | **Side panel list** or **toolbar popup menu** |
+| Open mode | Default **Popout** (recommended); **not recommended** for daily use: experimental **Side panel embed** |
 | Theme | Light / dark / follow system |
 | Backup | Export / import JSON |
 | Sync | Optional `chrome.storage.sync` when signed in |
@@ -62,6 +63,16 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 | Click while popout open | Focus only, no reload |
 | **Shift+click** / **right-click Open from start** | Load configured start URL |
 
+The side panel list includes **usage tips** below the shortcuts. With **Side panel embed** enabled, popup menu clicks open sites in a side-panel iframe; the toolbar icon stays on the popup menu.
+
+## 🧪 Side panel embed (experimental, v2.6.0)
+
+> [!WARNING]
+> **Not recommended.** This is experimental: browser APIs and site policies make **failures common and behavior unreliable**. Keep the default **Popout**. Only try embed briefly if you must; switch back to Popout when anything goes wrong.
+
+- **Options → Open mode → Side panel** opens sites in a full-screen iframe via the toolbar **popup menu** (toolbar stays on popup menu in this mode)
+- The `!` hint in Settings says the same; use **Open in popout** on embed failure; embed has **no** popout-style URL resume
+
 ## 📱 Mobile / desktop
 
 - Stored **URL is never rewritten** by the extension
@@ -77,10 +88,10 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 
 ---
 
-## 📌 FAQ: Why not browse websites inside the side panel?
+## 📌 FAQ: Side panel embed vs popout
 
-> [!NOTE]
-> Many users want to **read sites side-by-side in the panel**, like the old Edge sidebar. Early releases (v1.x) tried **iframe embedding**, but browser platform limits make that **unreliable and unfriendly**, so **v2.0.0+** uses a **shortcut list + popout window** instead. The table below summarizes the main platform constraints:
+> [!WARNING]
+> **Strongly prefer Popout** (separate window, reliable login and resume). **Side panel embed is not recommended for everyday use**—all limits below still apply in the v2.6.0 experiment. The main path since **v2.0.0** is **shortcut list + popout** (default iframe was dropped in v2.0.0 for the same class of issues).
 
 | Limitation | Explanation |
 |------------|-------------|

@@ -1,3 +1,19 @@
+.icon-btn[hidden],
+.empty-state[hidden],
+.launcher-open-error[hidden] {
+  display: none !important;
+}
+
+.launcher-open-error {
+  margin: 0 8px 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--danger, #dc2626);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--danger, #dc2626) 10%, var(--surface));
+}
+
 .icon-btn {
   display: inline-flex;
   align-items: center;

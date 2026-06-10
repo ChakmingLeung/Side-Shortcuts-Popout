@@ -63,9 +63,18 @@
 
         <ul id="shortcut-list" class="shortcut-list"></ul>
 
-        <p class="hint hint-open-mode" data-i18n="openModeSwitchHint">
-          If a page doesn't look right, switch that shortcut to Mobile or Desktop in Settings, then open it again.
-        </p>
+        <aside class="hint-tips" role="note" aria-labelledby="hint-tips-title">
+          <p id="hint-tips-title" class="hint-tips-title" data-i18n="openModeTipsTitle">使用提示</p>
+          <ul class="hint-tips-list">
+            <li data-i18n="openModeTipsItem1">
+              若打开页面未如理想，请在设置中将该入口切换打开方式（移动版 / 桌面版）后重新打开。
+            </li>
+            <li data-i18n="openModeTipsItem2">关闭小窗后再点可续看上次页面。</li>
+            <li data-i18n="openModeTipsItem3">
+              Shift+点击或右键选择「从头打开」回到起始网址。
+            </li>
+          </ul>
+        </aside>
 
         <p id="empty-state" class="empty-state" hidden>
           <span data-i18n="emptyState">No shortcuts yet.</span>
@@ -74,6 +83,27 @@
           </button>
         </p>
       </main>
+    </div>
+
+    <div id="embed-view" class="embed-view" hidden>
+      <div id="embed-loading" class="embed-loading" hidden aria-live="polite">
+        <span class="embed-loading-spinner" aria-hidden="true"></span>
+        <span data-i18n="embedLoading">正在加载…</span>
+      </div>
+      <div id="embed-error" class="embed-error" hidden role="alert">
+        <p data-i18n="embedLoadFailed">
+          该网站无法在侧栏内嵌显示，请改用小窗打开。
+        </p>
+        <button type="button" id="btn-embed-popout" class="embed-error-btn" data-i18n="embedOpenInPopout">
+          用小窗打开
+        </button>
+      </div>
+      <iframe
+        id="embed-frame"
+        class="embed-frame"
+        title="Embedded page"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-presentation"
+      ></iframe>
     </div>
     <script type="module" src="sidepanel.js"></script>
   </body>

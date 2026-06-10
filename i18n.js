@@ -68,10 +68,22 @@ const MESSAGES = {
     launcherMode: "点击工具栏图标",
     launcherModeMenu: "弹出菜单（图标+名称）",
     launcherModeSidebar: "侧栏列表",
+    experimentalBadge: "实验性功能",
+    popoutOpenMode: "打开方式",
+    popoutOpenModePopout: "小窗",
+    popoutOpenModeSidebar: "侧栏",
+    experimentalSidebarBrowseHintLabel: "侧栏打开方式说明",
+    experimentalSidebarBrowseHint:
+      "建议优先使用「小窗」。非必要请勿选「侧栏」：部分网站无法内嵌，可能出现无法登录或页面加载失败。",
+    sidebarEmbedBack: "返回快捷列表",
+    sidebarEmbedHint: "部分网站禁止嵌入，或在侧栏内无法正常登录、扫码。",
     pinToolbarHint:
       "建议将本扩展固定到工具栏：点击扩展图标（拼图）→ 找到「侧栏快捷小窗」→ 点击图钉，即可从工具栏一键打开。",
-    openModeSwitchHint:
-      "若打开页面未如理想，请在设置中将该入口切换打开方式（移动版 / 桌面版）后重新打开。关闭小窗后再点可续看上次页面；Shift+点击或右键选择「从头打开」回到起始网址。",
+    openModeTipsTitle: "使用提示",
+    openModeTipsItem1:
+      "若打开页面未如理想，请在设置中将该入口切换打开方式（移动版 / 桌面版）后重新打开。",
+    openModeTipsItem2: "关闭小窗后再点可续看上次页面。",
+    openModeTipsItem3: "Shift+点击或右键选择「从头打开」回到起始网址。",
     openFromStart: "从头打开（起始网址）",
     openFromStartShift: "Shift+点击：从头打开起始网址",
     emptyState: "还没有快捷入口。",
@@ -79,6 +91,13 @@ const MESSAGES = {
     actionTitleMenu: "打开快捷入口菜单",
     actionTitleSidebar: "打开 / 关闭侧栏快捷入口",
     contextMenuOpenPopout: "在小窗中打开此页",
+    errOpenFailed: "打开失败，请重试",
+    errOpenNoWindow: "未找到浏览器窗口，请聚焦到标签页后重试",
+    errOpenNotFound: "快捷入口不存在",
+    embedLoadFailed: "该网站无法在侧栏内嵌显示，请改用小窗打开。",
+    embedOpenInPopout: "用小窗打开",
+    embedLoading: "正在加载…",
+    embedOpeningPopout: "正在打开小窗…",
   },
   en: {
     docTitleOptions: "Side Shortcuts Popout - Settings",
@@ -145,10 +164,22 @@ const MESSAGES = {
     launcherMode: "Toolbar icon opens",
     launcherModeMenu: "Popup menu (icon + name)",
     launcherModeSidebar: "Side panel list",
+    experimentalBadge: "Experimental",
+    popoutOpenMode: "Open mode",
+    popoutOpenModePopout: "Popout",
+    popoutOpenModeSidebar: "Side panel",
+    experimentalSidebarBrowseHintLabel: "Side panel open mode",
+    experimentalSidebarBrowseHint:
+      "Prefer Popout. Avoid Side panel unless needed—some sites cannot embed and may fail to log in or load.",
+    sidebarEmbedBack: "Back to shortcuts",
+    sidebarEmbedHint: "Some sites block embedding or cannot log in / show QR codes in the panel.",
     pinToolbarHint:
       "Pin this extension: open the extensions menu (puzzle icon) → find Side Shortcuts Popout → click the pin for one-click toolbar access.",
-    openModeSwitchHint:
-      "If a page doesn't look right, switch Mobile/Desktop in Settings and open again. After closing a popout, click to resume where you left off; Shift+click or right-click → Open start URL.",
+    openModeTipsTitle: "Tips",
+    openModeTipsItem1:
+      "If a page doesn't look right, switch that shortcut to Mobile or Desktop in Settings, then open it again.",
+    openModeTipsItem2: "After closing a popout, click again to resume where you left off.",
+    openModeTipsItem3: "Shift+click or right-click → Open start URL to return to the configured start URL.",
     openFromStart: "Open start URL",
     openFromStartShift: "Shift+click: open configured start URL",
     emptyState: "No shortcuts yet.",
@@ -156,6 +187,13 @@ const MESSAGES = {
     actionTitleMenu: "Open shortcuts menu",
     actionTitleSidebar: "Open / close side panel shortcuts",
     contextMenuOpenPopout: "Open this page in popout",
+    errOpenFailed: "Could not open. Please try again.",
+    errOpenNoWindow: "No browser window found. Focus a tab and try again.",
+    errOpenNotFound: "Shortcut not found",
+    embedLoadFailed: "This site cannot be embedded in the side panel. Try opening in a popout.",
+    embedOpenInPopout: "Open in popout",
+    embedLoading: "Loading…",
+    embedOpeningPopout: "Opening popout…",
   },
 };
 

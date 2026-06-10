@@ -6,9 +6,15 @@ export const MOBILE_USER_AGENT =
 export const MOBILE_VIEWPORT_WIDTH = 375;
 
 const RULE_ID_BASE = 1_000_000;
+const EMBED_INITIATOR_RULE_ID = 2_000_000;
 
 /** Tabs opened in mobile mode — UA rules + in-page viewport / navigator shim. */
 const mobileModeTabIds = new Set();
+
+/** 侧栏内嵌移动版：扩展发起的 iframe 请求 + 页面内 navigator/viewport 注入 */
+let embedMobileActive = false;
+/** @type {string | null} */
+let embedMobileUrl = null;
 
 const MOBILE_REQUEST_HEADERS = [
   { header: "user-agent", operation: "set", value: MOBILE_USER_AGENT },
@@ -22,6 +28,7 @@ function mobileUaRuleId(tabId) {
 }
 
 export async function applyMobileUserAgentForTab(tabId) {
+  if (mobileModeTabIds.has(tabId)) return;
   mobileModeTabIds.add(tabId);
   const ruleId = mobileUaRuleId(tabId);
   await chrome.declarativeNetRequest.updateSessionRules({
@@ -106,7 +113,7 @@ function injectMobileEmulation(ua, viewportWidth) {
   }
 }
 
-function shouldInjectMobile(details) {
+function shouldInjectMobilePopout(details) {
   return details.frameId === 0 && mobileModeTabIds.has(details.tabId);
 }
 
@@ -122,7 +129,110 @@ function injectMobileEmulationIntoTab(tabId) {
     .catch(() => {});
 }
 
-chrome.webNavigation.onCommitted.addListener((details) => {
-  if (!shouldInjectMobile(details)) return;
-  injectMobileEmulationIntoTab(details.tabId);
+function isEmbedRelatedUrl(frameUrl, embedUrl) {
+  try {
+    const frame = new URL(frameUrl);
+    const embed = new URL(embedUrl);
+    if (frame.origin === embed.origin) return true;
+    const embedHost = embed.hostname.replace(/^www\./, "");
+    return (
+      frame.hostname === embedHost || frame.hostname.endsWith(`.${embedHost}`)
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function updateEmbedInitiatorUaRule(enabled) {
+  if (!enabled) {
+    await chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds: [EMBED_INITIATOR_RULE_ID],
+    });
+    return;
+  }
+
+  await chrome.declarativeNetRequest.updateSessionRules({
+    removeRuleIds: [EMBED_INITIATOR_RULE_ID],
+    addRules: [
+      {
+        id: EMBED_INITIATOR_RULE_ID,
+        priority: 2,
+        action: {
+          type: "modifyHeaders",
+          requestHeaders: MOBILE_REQUEST_HEADERS,
+        },
+        condition: {
+          initiatorDomains: [chrome.runtime.id],
+          urlFilter: "*",
+          resourceTypes: [
+            "main_frame",
+            "sub_frame",
+            "xmlhttprequest",
+            "script",
+            "stylesheet",
+          ],
+        },
+      },
+    ],
+  });
+}
+
+/** @param {boolean} mobile @param {string | null} [embedUrl] */
+export async function syncEmbedMobileUa(mobile, embedUrl = null) {
+  const nextUrl = mobile && embedUrl ? embedUrl : null;
+  if (embedMobileActive === mobile && embedMobileUrl === nextUrl) return;
+  embedMobileActive = mobile;
+  embedMobileUrl = nextUrl;
+  await updateEmbedInitiatorUaRule(mobile);
+}
+
+async function injectMobileEmulationIntoEmbedFrame(frameId) {
+  let contexts = [];
+  try {
+    contexts = await chrome.runtime.getContexts({ contextTypes: ["SIDE_PANEL"] });
+  } catch {
+    /* */
+  }
+
+  const panel = contexts[0];
+  if (!panel) return;
+
+  /** @type {chrome.scripting.InjectionTarget} */
+  let target;
+  if (panel.documentId) {
+    target = { documentIds: [panel.documentId], frameIds: [frameId] };
+  } else if (panel.tabId != null) {
+    target = { tabId: panel.tabId, frameIds: [frameId] };
+  } else {
+    return;
+  }
+
+  chrome.scripting
+    .executeScript({
+      target,
+      world: "MAIN",
+      injectImmediately: true,
+      func: injectMobileEmulation,
+      args: [MOBILE_USER_AGENT, MOBILE_VIEWPORT_WIDTH],
+    })
+    .catch(() => {});
+}
+
+export function handleMobileNavigationCommitted(details) {
+  if (shouldInjectMobilePopout(details)) {
+    injectMobileEmulationIntoTab(details.tabId);
+    return;
+  }
+
+  if (!embedMobileActive || !embedMobileUrl) return;
+  if (details.frameType !== "sub_frame") return;
+  if (!isEmbedRelatedUrl(details.url, embedMobileUrl)) return;
+
+  injectMobileEmulationIntoEmbedFrame(details.frameId).catch(() => {});
+}
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  if (mobileModeTabIds.has(tabId)) {
+    clearMobileUserAgentForTab(tabId).catch(() => {});
+  }
 });

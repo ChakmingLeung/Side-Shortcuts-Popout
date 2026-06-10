@@ -70,10 +70,41 @@
           <label class="field">
             <span data-i18n="launcherMode">点击工具栏图标</span>
             <select id="launcher-mode">
-              <option value="menu" data-i18n="launcherModeMenu">弹出菜单（图标+名称）</option>
               <option value="sidebar" data-i18n="launcherModeSidebar">侧栏列表</option>
+              <option value="menu" data-i18n="launcherModeMenu">弹出菜单（图标+名称）</option>
             </select>
           </label>
+          <div class="field field-popout-open-mode">
+            <div class="field-label-row">
+              <span data-i18n="popoutOpenMode">打开方式</span>
+              <button
+                type="button"
+                class="field-info-hint"
+                id="popout-open-mode-hint"
+                data-i18n-attr="aria-label"
+                data-i18n="experimentalSidebarBrowseHintLabel"
+                aria-label="侧栏打开方式说明"
+              >
+                <span class="field-info-hint-icon" aria-hidden="true">!</span>
+                <span class="field-info-hint-tooltip" role="tooltip" data-i18n="experimentalSidebarBrowseHint">
+                  建议优先使用「小窗」。非必要请勿选「侧栏」：部分网站无法内嵌，可能出现无法登录或页面加载失败。
+                </span>
+              </button>
+            </div>
+            <div class="popout-open-mode-options" role="radiogroup" data-i18n-attr="aria-label" data-i18n="popoutOpenMode">
+              <label class="popout-open-mode-option">
+                <input type="radio" name="popout-open-mode" value="popout" checked />
+                <span class="popout-open-mode-option-label" data-i18n="popoutOpenModePopout">小窗</span>
+              </label>
+              <label class="popout-open-mode-option">
+                <input type="radio" name="popout-open-mode" value="sidebar" />
+                <span class="popout-open-mode-option-label" data-i18n="popoutOpenModeSidebar">侧栏</span>
+                <span class="badge badge-experimental">
+                  <span data-i18n="experimentalBadge">实验性功能</span>
+                </span>
+              </label>
+            </div>
+          </div>
         </div>
       </section>
 

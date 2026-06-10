@@ -7,7 +7,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.5.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](CHANGELOG.md)
 
 在 Microsoft Edge [逐步下线内置侧边栏 App Tower](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge) 的背景下，本扩展通过浏览器原生 **Side Panel（侧边栏）** API，纵向列出可配置的网页快捷入口；**点击即在独立小窗打开**，与主窗口并排浏览，登录态与常规标签页一致。
 
@@ -20,7 +20,8 @@
 | 浏览进度 | 小窗仍开着时再点 → 只聚焦、不刷新；关窗后再点 → 本次浏览器会话内恢复上次页面 URL |
 | 回到起始页 | **Shift+点击** 或 **右键「从头打开」** → 加载设置里配置的起始网址 |
 | 移动 / 桌面 | 每条入口单独选择；移动版用 Android UA + 375px 宽 + viewport 注入 |
-| 打开方式 | 工具栏图标可切换 **侧栏列表** 或 **弹出菜单** |
+| 点击工具栏图标 | 可切换 **侧栏列表** 或 **弹出菜单** |
+| 打开方式 | 默认 **小窗**（推荐）；**不建议**日常使用实验性 **侧栏内嵌** |
 | 外观主题 | 设置页可选跟随系统 / 浅色 / 深色 |
 | 备份与恢复 | 导出/导入 JSON 配置 |
 | 配置同步 | 登录浏览器账号后，修改可通过 `chrome.storage.sync` 同步 |
@@ -62,6 +63,16 @@
 | 小窗仍开着时再点 | 只聚焦，不刷新 |
 | **Shift+点击** / **右键从头打开** | 加载起始网址 |
 
+侧栏列表底部有 **使用提示**（移动/桌面、续看、从头打开）。若设置里选了 **侧栏内嵌**，弹出菜单点入口会在侧栏 iframe 打开，工具栏图标固定为弹出菜单。
+
+## 🧪 侧栏内嵌（实验性，v2.6.0）
+
+> [!WARNING]
+> **不建议使用。** 此为实验功能，受浏览器 API 与站点策略限制，**异常概率高、体验不稳定**；请保持默认 **小窗**。仅在确有需要时短期尝试，出现问题请立即改回小窗。
+
+- 设置 → **打开方式** → **侧栏**：从工具栏 **弹出菜单** 点入口后，在侧栏全屏 iframe 浏览（开启后工具栏固定为弹出菜单）
+- 设置页 `!` 有相同说明；内嵌失败时可 **用小窗打开**；内嵌模式**无**小窗式 URL 续看
+
 ## 📱 移动版 / 桌面版
 
 - **存储的 URL** 始终为你填写的内容，扩展不会自动改写
@@ -77,10 +88,10 @@
 
 ---
 
-## 📌 特别说明：为何不在侧栏里直接浏览网页？
+## 📌 特别说明：侧栏内嵌与小窗
 
-> [!NOTE]
-> 很多用户希望像旧版 Edge 侧栏那样，**在侧栏里并排看网页**。早期版本（v1.x）也曾尝试用 **iframe 内嵌** 实现，但受浏览器平台限制，**无法稳定、友好地复现**，自 **v2.0.0** 起改为「侧栏快捷列表 + 点击开小窗」。下表为平台层面的主要限制：
+> [!WARNING]
+> **强烈建议始终使用「小窗」**（独立窗口、登录与续看最稳定）。**侧栏内嵌不建议作为日常方案**——下表所列限制在 v2.6.0 实验模式中仍全部存在；v1.x 曾因同类问题在 v2.0.0 放弃默认 iframe，主路径一直是「侧栏快捷列表 + 点击开小窗」。
 
 | 限制 | 说明 |
 |------|------|

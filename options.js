@@ -11,6 +11,12 @@ import {
   GITHUB_AUTHOR_URL,
   GITHUB_REPO_URL,
   normalizeLauncherMode,
+  normalizePopoutOpenMode,
+  isSidebarEmbedOpenMode,
+  applyPopoutOpenModeToSettings,
+  DEFAULT_SETTINGS,
+  shouldHandleStorageUpdate,
+  shouldSyncLauncherFromSettingsChange,
 } from "./shared.js";
 import {
   initI18n,
@@ -20,13 +26,19 @@ import {
   syncLanguageSelect,
 } from "./i18n.js";
 import { initTheme, syncThemeSelect, setThemePreference, applyTheme } from "./theme.js";
-import { syncLauncherModeSelect } from "./launcher.js";
+import {
+  syncLauncherModeSelect,
+  applyLauncherMode,
+  applyLauncherModeFromSettings,
+  requestLauncherSyncFromBackground,
+} from "./launcher.js";
 import {
   buildBackupPayload,
   downloadBackupJson,
   parseBackupJson,
   applyBackupImport,
 } from "./backup.js";
+import { clearSidebarEmbedRequest, getSidebarEmbedRequest } from "./sidebar-embed.js";
 
 const form = document.getElementById("shortcut-form");
 const formTitle = document.getElementById("form-title");
@@ -36,6 +48,7 @@ const mobileModeSelect = document.getElementById("mobile-mode");
 const languageSelect = document.getElementById("language");
 const themeSelect = document.getElementById("theme");
 const launcherModeSelect = document.getElementById("launcher-mode");
+const popoutOpenModeRadios = document.querySelectorAll('input[name="popout-open-mode"]');
 const formError = document.getElementById("form-error");
 const manageList = document.getElementById("manage-list");
 const manageEmpty = document.getElementById("manage-empty");
@@ -354,22 +367,60 @@ async function renderManageList(shortcuts) {
 }
 
 async function removeShortcut(id) {
+  const embed = await getSidebarEmbedRequest();
+  if (embed?.shortcutId === id) {
+    await clearSidebarEmbedRequest();
+  }
   const shortcuts = await getShortcuts();
   await saveShortcuts(shortcuts.filter((s) => s.id !== id));
   await refresh();
   if (editingInlineId === id) editingInlineId = null;
 }
 
-async function refresh() {
-  const shortcuts = await getShortcuts();
-  await renderManageList(shortcuts);
+async function refresh(shortcuts = null) {
+  const list = shortcuts ?? (await getShortcuts());
+  await renderManageList(list);
+}
+
+function getPopoutOpenModeValue() {
+  const checked = document.querySelector('input[name="popout-open-mode"]:checked');
+  return normalizePopoutOpenMode(checked?.value ?? "popout");
+}
+
+function setPopoutOpenModeValue(settingsOrMode) {
+  const value = normalizePopoutOpenMode(settingsOrMode);
+  popoutOpenModeRadios.forEach((radio) => {
+    radio.checked = radio.value === value;
+  });
+}
+
+function syncPopoutOpenModeUi(settings) {
+  const sidebarMode = isSidebarEmbedOpenMode(settings);
+  setPopoutOpenModeValue(settings);
+  if (launcherModeSelect) {
+    launcherModeSelect.disabled = sidebarMode;
+    syncLauncherModeSelect(launcherModeSelect, settings);
+    launcherModeSelect.closest(".field")?.classList.toggle("field-disabled", sidebarMode);
+  }
+}
+
+async function applyLauncherFromSettings(settings) {
+  if (isSidebarEmbedOpenMode(settings)) {
+    await applyLauncherMode("menu");
+  } else {
+    await applyLauncherModeFromSettings(settings);
+  }
 }
 
 async function loadSettings() {
   const settings = await getSettings();
   syncLanguageSelect(languageSelect, settings);
   syncThemeSelect(themeSelect, settings);
-  syncLauncherModeSelect(launcherModeSelect, settings);
+  syncPopoutOpenModeUi(settings);
+  await applyLauncherFromSettings(settings);
+  if (isSidebarEmbedOpenMode(settings)) {
+    await requestLauncherSyncFromBackground();
+  }
 }
 
 themeSelect.addEventListener("change", async () => {
@@ -377,9 +428,28 @@ themeSelect.addEventListener("change", async () => {
 });
 
 launcherModeSelect?.addEventListener("change", async () => {
+  if (launcherModeSelect.disabled) return;
   const settings = await getSettings();
   settings.launcherMode = normalizeLauncherMode(launcherModeSelect.value);
   await saveSettings(settings);
+  await applyLauncherMode(settings.launcherMode);
+});
+
+popoutOpenModeRadios.forEach((radio) => {
+  radio.addEventListener("change", async () => {
+    if (!radio.checked) return;
+    let settings = await getSettings();
+    settings = applyPopoutOpenModeToSettings(settings, getPopoutOpenModeValue());
+    if (isSidebarEmbedOpenMode(settings)) {
+      settings.launcherMode = "menu";
+    } else {
+      await clearSidebarEmbedRequest();
+    }
+    await saveSettings(settings);
+    syncPopoutOpenModeUi(settings);
+    await applyLauncherFromSettings(settings);
+    await requestLauncherSyncFromBackground();
+  });
 });
 
 languageSelect.addEventListener("change", async () => {
@@ -511,20 +581,39 @@ importBackupFile?.addEventListener("change", async () => {
   }
 });
 
-chrome.storage.onChanged.addListener(async (changes) => {
-  if (changes.settings) {
-    const settings = changes.settings.newValue ?? {};
+chrome.storage.onChanged.addListener(async (changes, area) => {
+  if (
+    changes.settings?.newValue &&
+    shouldHandleStorageUpdate(area, "settings", changes.settings.newValue)
+  ) {
+    const prev = changes.settings.oldValue ?? {};
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      ...changes.settings.newValue,
+    };
+    settings.popoutOpenMode = normalizePopoutOpenMode(settings);
     if (settings.theme !== undefined) applyTheme(settings.theme);
     syncThemeSelect(themeSelect, settings);
-    syncLauncherModeSelect(launcherModeSelect, settings);
+    syncPopoutOpenModeUi(settings);
+    if (shouldSyncLauncherFromSettingsChange(prev, changes.settings.newValue)) {
+      await applyLauncherFromSettings(settings);
+      await requestLauncherSyncFromBackground();
+    }
     await initI18n();
     syncLanguageSelect(languageSelect, settings);
     applyOptionsI18n();
     applyAuthorFooter();
-    await refresh();
-    return;
+    if (settings.locale !== prev.locale) {
+      await refresh();
+    }
   }
-  if (changes.shortcuts) await refresh();
+
+  if (changes.shortcuts) {
+    const list = changes.shortcuts.newValue ?? [];
+    if (shouldHandleStorageUpdate(area, "shortcuts", list)) {
+      await refresh(list);
+    }
+  }
 });
 
 function applyAuthorFooter() {

@@ -7,6 +7,9 @@ import {
   normalizeUrl,
   isValidUrl,
   normalizeLauncherMode,
+  normalizePopoutOpenMode,
+  isSidebarEmbedOpenMode,
+  applyPopoutOpenModeToSettings,
 } from "./shared.js";
 import { normalizeTheme } from "./theme.js";
 
@@ -41,6 +44,15 @@ function sanitizeSettings(raw) {
   }
   if (raw.launcherMode !== undefined) {
     settings.launcherMode = normalizeLauncherMode(raw.launcherMode);
+  }
+  if (raw.popoutOpenMode !== undefined) {
+    return applyPopoutOpenModeToSettings(settings, raw.popoutOpenMode);
+  }
+  if (raw.experimentalSidebarBrowse !== undefined) {
+    return applyPopoutOpenModeToSettings(
+      settings,
+      raw.experimentalSidebarBrowse === true ? "sidebar" : "popout"
+    );
   }
   return settings;
 }

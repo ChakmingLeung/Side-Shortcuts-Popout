@@ -19,7 +19,45 @@ export const DEFAULT_SETTINGS = {
   theme: "system",
   /** "menu" | "sidebar" — toolbar icon opens popup menu or side panel list */
   launcherMode: "sidebar",
+  /** "popout" | "sidebar" — popup menu shortcut opens popout window or side panel embed */
+  popoutOpenMode: "popout",
 };
+
+export function normalizePopoutOpenMode(settingsOrValue) {
+  if (typeof settingsOrValue === "object" && settingsOrValue !== null) {
+    const settings = settingsOrValue;
+    if (settings.popoutOpenMode === "sidebar") return "sidebar";
+    if (settings.popoutOpenMode === "popout") return "popout";
+    if (settings.experimentalSidebarBrowse === true) return "sidebar";
+    return "popout";
+  }
+  return settingsOrValue === "sidebar" ? "sidebar" : "popout";
+}
+
+/** @param {Record<string, unknown>} settings */
+export function applyPopoutOpenModeToSettings(settings, mode) {
+  const next = { ...settings };
+  next.popoutOpenMode = normalizePopoutOpenMode(mode);
+  delete next.experimentalSidebarBrowse;
+  return next;
+}
+
+export function isSidebarEmbedOpenMode(settings) {
+  return normalizePopoutOpenMode(settings) === "sidebar";
+}
+
+/** settings 变更时是否需要重新同步工具栏打开方式（embed 模式须持续强制 popup 菜单） */
+export function shouldSyncLauncherFromSettingsChange(prev, next) {
+  const prevSettings = { ...DEFAULT_SETTINGS, ...prev };
+  const nextSettings = { ...DEFAULT_SETTINGS, ...next };
+  if (isSidebarEmbedOpenMode(nextSettings)) return true;
+  return (
+    nextSettings.launcherMode !== prevSettings.launcherMode ||
+    normalizePopoutOpenMode(prevSettings) !== normalizePopoutOpenMode(nextSettings) ||
+    next.experimentalSidebarBrowse !== prev?.experimentalSidebarBrowse ||
+    isSidebarEmbedOpenMode(prevSettings) !== isSidebarEmbedOpenMode(nextSettings)
+  );
+}
 
 export function normalizeLauncherMode(value) {
   return value === "sidebar" ? "sidebar" : "menu";
@@ -34,6 +72,62 @@ async function storageSet(key, value) {
   } catch {
     /* 未登录、同步关闭或超出 sync 配额时仅保留本机副本 */
   }
+}
+
+/** local+sync 双写时跳过 sync 回声的重复处理 */
+const localStorageEcho = new Map();
+
+/** 进程内 storage 读缓存（各页面/SW 独立，onChanged 时失效） */
+const storageCache = {
+  settings: /** @type {Record<string, unknown> | null} */ (null),
+  shortcuts: /** @type {Array<unknown> | null} */ (null),
+  lastShortcutId: /** @type {string | null | undefined} */ (undefined),
+};
+
+function mergeSettings(localVal, syncVal) {
+  const merged = { ...DEFAULT_SETTINGS, ...localVal, ...syncVal };
+  merged.popoutOpenMode = normalizePopoutOpenMode(merged);
+  return merged;
+}
+
+function mergeShortcuts(syncList, localList) {
+  if (Array.isArray(syncList) && syncList.length > 0) return syncList;
+  if (Array.isArray(localList) && localList.length > 0) return localList;
+  if (Array.isArray(syncList)) return syncList;
+  if (Array.isArray(localList)) return localList;
+  return [];
+}
+
+function invalidateStorageCache(key) {
+  if (key === SETTINGS_KEY) storageCache.settings = null;
+  if (key === STORAGE_KEY) storageCache.shortcuts = null;
+  if (key === LAST_KEY) storageCache.lastShortcutId = undefined;
+}
+
+if (typeof chrome !== "undefined" && chrome.storage?.onChanged) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local" && area !== "sync") return;
+    if (changes[SETTINGS_KEY]) invalidateStorageCache(SETTINGS_KEY);
+    if (changes[STORAGE_KEY]) invalidateStorageCache(STORAGE_KEY);
+    if (changes[LAST_KEY]) invalidateStorageCache(LAST_KEY);
+  });
+}
+
+export function shouldHandleStorageUpdate(area, key, newValue) {
+  const signature = JSON.stringify(newValue ?? null);
+  if (area === "local") {
+    localStorageEcho.set(key, signature);
+    return true;
+  }
+  if (area === "sync") {
+    if (localStorageEcho.get(key) === signature) {
+      localStorageEcho.delete(key);
+      return false;
+    }
+    localStorageEcho.set(key, signature);
+    return true;
+  }
+  return true;
 }
 
 async function readFromAreas(key) {
@@ -53,12 +147,11 @@ async function readFromAreas(key) {
 }
 
 async function readShortcutsFromAreas() {
+  if (storageCache.shortcuts !== null) return storageCache.shortcuts;
   const { syncVal: syncList, localVal: localList } = await readFromAreas(STORAGE_KEY);
-  if (Array.isArray(syncList) && syncList.length > 0) return syncList;
-  if (Array.isArray(localList) && localList.length > 0) return localList;
-  if (Array.isArray(syncList)) return syncList;
-  if (Array.isArray(localList)) return localList;
-  return [];
+  const merged = mergeShortcuts(syncList, localList);
+  storageCache.shortcuts = merged;
+  return merged;
 }
 
 /** 是否已有用户保存的快捷入口（sync 已有该键、或 local 有条目 → 不写预置） */
@@ -103,15 +196,22 @@ export async function getShortcuts() {
 
 export async function saveShortcuts(shortcuts) {
   await storageSet(STORAGE_KEY, shortcuts);
+  storageCache.shortcuts = shortcuts;
 }
 
 export async function getLastShortcutId() {
+  if (storageCache.lastShortcutId !== undefined) {
+    return storageCache.lastShortcutId;
+  }
   const { syncVal, localVal } = await readFromAreas(LAST_KEY);
-  return syncVal ?? localVal ?? null;
+  const id = syncVal ?? localVal ?? null;
+  storageCache.lastShortcutId = id;
+  return id;
 }
 
 export async function setLastShortcutId(id) {
   await storageSet(LAST_KEY, id);
+  storageCache.lastShortcutId = id;
 }
 
 export async function hasStoredSettings() {
@@ -120,12 +220,16 @@ export async function hasStoredSettings() {
 }
 
 export async function getSettings() {
+  if (storageCache.settings) return storageCache.settings;
   const { syncVal, localVal } = await readFromAreas(SETTINGS_KEY);
-  return { ...DEFAULT_SETTINGS, ...localVal, ...syncVal };
+  const merged = mergeSettings(localVal, syncVal);
+  storageCache.settings = merged;
+  return merged;
 }
 
 export async function saveSettings(settings) {
   await storageSet(SETTINGS_KEY, settings);
+  storageCache.settings = mergeSettings(null, settings);
 }
 
 export function escapeHtml(str) {
@@ -237,8 +341,14 @@ export function findShortcutByUrl(urlString, shortcuts) {
   return shortcuts.find((s) => normalizeUrl(s.url) === canonical) ?? null;
 }
 
+export const EPHEMERAL_POPOUT_PREFIX = "__ctx__:";
+
 export function contextPopoutShortcutId(urlString) {
-  return `__ctx__:${normalizeUrl(urlString)}`;
+  return `${EPHEMERAL_POPOUT_PREFIX}${normalizeUrl(urlString)}`;
+}
+
+export function isEphemeralPopoutId(shortcutId) {
+  return typeof shortcutId === "string" && shortcutId.startsWith(EPHEMERAL_POPOUT_PREFIX);
 }
 
 export function resolveLoadUrl(shortcut) {

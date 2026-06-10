@@ -21,6 +21,10 @@ body {
   color: var(--text);
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .page {
   width: 100%;
   max-width: min(1120px, calc(100vw - 40px));
@@ -135,9 +139,24 @@ body {
 }
 
 .settings-fields-row {
+  --settings-control-height: 40px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+.settings-fields-row .field > span,
+.settings-fields-row .field-label-row {
+  display: flex;
+  align-items: center;
+  min-height: 18px;
+}
+
+.settings-fields-row .field > select {
+  box-sizing: border-box;
+  height: var(--settings-control-height);
+  padding-block: 0;
+  padding-inline: 12px;
 }
 
 .card-list-header {
@@ -307,6 +326,167 @@ body {
   background: var(--bg);
   color: var(--text);
   font: inherit;
+}
+
+.field-disabled select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--bg) 85%, var(--border));
+}
+
+.field-checkbox {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.field-checkbox input[type="checkbox"] {
+  width: auto;
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-info-hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  color: var(--accent);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+}
+
+.field-info-hint:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  outline-offset: 2px;
+}
+
+.field-info-hint-icon {
+  display: block;
+  line-height: 1;
+}
+
+.field-info-hint-tooltip {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  z-index: 30;
+  width: max(240px, min(320px, calc(100vw - 48px)));
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--text) 14%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+
+.field-info-hint:hover .field-info-hint-tooltip,
+.field-info-hint:focus-visible .field-info-hint-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 640px) {
+  .field-info-hint-tooltip {
+    left: auto;
+    right: 0;
+    top: calc(100% + 8px);
+    transform: none;
+    width: min(320px, calc(100vw - 48px));
+  }
+}
+
+.popout-open-mode-options {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 8px;
+  height: var(--settings-control-height, 40px);
+}
+
+.popout-open-mode-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+}
+
+.popout-open-mode-option:has(input:checked) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+}
+
+.popout-open-mode-option input[type="radio"] {
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.popout-open-mode-option-label {
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.popout-open-mode-option .badge.badge-experimental {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.badge.badge-experimental {
+  width: auto;
+  min-width: max-content;
+  height: auto;
+  margin-left: 0;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
 }
 
 .field-hint {

@@ -1,9 +1,16 @@
 import {
   getShortcuts,
   getLastShortcutId,
+  getSettings,
+  isSidebarEmbedOpenMode,
+  shouldHandleStorageUpdate,
   createShortcutIcon,
   escapeHtml,
 } from "./shared.js";
+import {
+  openSidePanelFromPopup,
+  prepareSidebarEmbedFromShortcut,
+} from "./sidebar-embed.js";
 import { initI18n, applyDocumentI18n, applyToolbarI18n, t } from "./i18n.js";
 import { initTheme, applyTheme } from "./theme.js";
 
@@ -16,14 +23,37 @@ function hostFromUrl(url) {
 }
 
 /**
- * @param {{ mode: "menu" | "sidebar", variant: "popup" | "sidebar", closeOnOpen?: boolean }} opts
+ * @param {{ variant: "popup" | "sidebar", closeOnOpen?: boolean, attachStorageListener?: boolean }} opts
  */
-export async function initLauncherList({ variant, closeOnOpen = false }) {
+export async function initLauncherList({
+  variant,
+  closeOnOpen = false,
+  attachStorageListener = true,
+}) {
   const shortcutList = document.getElementById("shortcut-list");
   const emptyState = document.getElementById("empty-state");
   const btnSettings = document.getElementById("btn-settings");
   const btnAddFirst = document.getElementById("btn-add-first");
   const isSidebar = variant === "sidebar";
+
+  let openErrorEl = document.getElementById("launcher-open-error");
+  if (!openErrorEl && shortcutList?.parentElement) {
+    openErrorEl = document.createElement("p");
+    openErrorEl.id = "launcher-open-error";
+    openErrorEl.className = "launcher-open-error";
+    openErrorEl.hidden = true;
+    shortcutList.parentElement.insertBefore(openErrorEl, shortcutList);
+  }
+
+  function showOpenError(key) {
+    if (!openErrorEl) return;
+    openErrorEl.textContent = t(key);
+    openErrorEl.hidden = false;
+  }
+
+  function hideOpenError() {
+    if (openErrorEl) openErrorEl.hidden = true;
+  }
 
   let shortcutsCache = [];
   let lastOpenedId = null;
@@ -74,13 +104,43 @@ export async function initLauncherList({ variant, closeOnOpen = false }) {
   }
 
   async function openShortcut(shortcut, { fromStart = false } = {}) {
+    hideOpenError();
     try {
+      const settings = await getSettings();
+      const sidebarEmbed = isSidebarEmbedOpenMode(settings);
+
+      if (sidebarEmbed) {
+        try {
+          await prepareSidebarEmbedFromShortcut(shortcut, { fromStart });
+          if (!isSidebar) {
+            await openSidePanelFromPopup();
+            if (closeOnOpen) window.close();
+          } else {
+            lastOpenedId = shortcut.id;
+            highlightActive(shortcut.id);
+          }
+        } catch (err) {
+          const key =
+            err instanceof Error && err.message === "no_window"
+              ? "errOpenNoWindow"
+              : "errOpenFailed";
+          showOpenError(key);
+        }
+        return;
+      }
+
       const res = await chrome.runtime.sendMessage({
         type: "OPEN_SHORTCUT",
         shortcutId: shortcut.id,
         fromStart,
+        source: isSidebar ? "sidebar" : "popup",
       });
-      if (!res?.ok) return;
+      if (!res?.ok) {
+        const key = res?.error === "not_found" ? "errOpenNotFound" : "errOpenFailed";
+        showOpenError(key);
+        return;
+      }
+
       if (isSidebar) {
         lastOpenedId = shortcut.id;
         highlightActive(shortcut.id);
@@ -88,7 +148,7 @@ export async function initLauncherList({ variant, closeOnOpen = false }) {
         window.close();
       }
     } catch {
-      /* service worker unavailable */
+      showOpenError("errOpenFailed");
     }
   }
 
@@ -151,8 +211,11 @@ export async function initLauncherList({ variant, closeOnOpen = false }) {
     closePage();
   });
 
-  chrome.storage.onChanged.addListener(async (changes) => {
-    if (changes.settings?.newValue) {
+  async function handleStorageChange(changes, area) {
+    if (
+      changes.settings?.newValue &&
+      shouldHandleStorageUpdate(area, "settings", changes.settings.newValue)
+    ) {
       const settings = changes.settings.newValue;
       if (settings.theme !== undefined) applyTheme(settings.theme);
       await initI18n();
@@ -166,10 +229,18 @@ export async function initLauncherList({ variant, closeOnOpen = false }) {
     }
 
     if (changes.shortcuts) {
-      shortcutsCache = changes.shortcuts.newValue ?? [];
+      const list = changes.shortcuts.newValue ?? [];
+      if (!shouldHandleStorageUpdate(area, "shortcuts", list)) return;
+      shortcutsCache = list;
       renderShortcuts(shortcutsCache);
     }
-  });
+  }
+
+  if (attachStorageListener) {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      handleStorageChange(changes, area).catch(() => {});
+    });
+  }
 
   await initTheme();
   await initI18n();
@@ -184,4 +255,5 @@ export async function initLauncherList({ variant, closeOnOpen = false }) {
     shortcutsCache = await getShortcuts();
   }
   renderShortcuts(shortcutsCache);
+  return { handleStorageChange };
 }

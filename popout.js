@@ -3,6 +3,7 @@ import {
   setLastShortcutId,
   normalizeUrl,
   shouldUseMobile,
+  isEphemeralPopoutId,
 } from "./shared.js";
 import {
   applyMobileUserAgentForTab,
@@ -70,6 +71,7 @@ async function countOpenPopouts() {
       await chrome.windows.get(windowId);
       count++;
     } catch {
+      clearMobileUserAgentForTab(tabId).catch(() => {});
       unbindPopoutTab(tabId);
       popoutWindows.delete(shortcutId);
     }
@@ -89,23 +91,23 @@ function untrackWindow(windowId) {
 
 chrome.windows.onRemoved.addListener(untrackWindow);
 
-chrome.webNavigation.onCommitted.addListener((details) => {
+export function handlePopoutNavigationCommitted(details) {
   if (details.frameId !== 0) return;
   const shortcutId = tabIdToShortcutId.get(details.tabId);
   if (!shortcutId || !isValidResumeUrl(details.url)) return;
   setResumeUrl(shortcutId, details.url).catch(() => {});
-});
+}
 
 export async function removeStalePopouts(validIds) {
   const valid = new Set(validIds);
   for (const [shortcutId, { windowId }] of popoutWindows) {
+    if (isEphemeralPopoutId(shortcutId)) continue;
     if (valid.has(shortcutId)) continue;
     try {
       await chrome.windows.remove(windowId);
     } catch {
-      /* already closed */
+      untrackWindow(windowId);
     }
-    untrackWindow(windowId);
   }
 }
 
@@ -175,6 +177,8 @@ export async function openShortcutPopout(
       if (updateLastShortcut) await setLastShortcutId(shortcut.id);
       return { windowId: existing.windowId, reused: true };
     } catch {
+      clearMobileUserAgentForTab(existing.tabId).catch(() => {});
+      unbindPopoutTab(existing.tabId);
       popoutWindows.delete(shortcut.id);
     }
   }

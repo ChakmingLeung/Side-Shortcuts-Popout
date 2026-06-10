@@ -1,23 +1,38 @@
-import { getSettings, saveSettings, normalizeLauncherMode } from "./shared.js";
+import { getSettings, saveSettings, normalizeLauncherMode, isSidebarEmbedOpenMode } from "./shared.js";
+import { resolveBrowserWindowIdForSidePanel } from "./sidebar-embed.js";
 
 const POPUP_PATH = "popup.html";
 
+export function resolveLauncherMode(settings) {
+  if (isSidebarEmbedOpenMode(settings)) return "menu";
+  return normalizeLauncherMode(settings?.launcherMode);
+}
+
 export function syncLauncherModeSelect(select, settings) {
   if (!select) return;
-  select.value = normalizeLauncherMode(settings?.launcherMode);
+  select.value = resolveLauncherMode(settings);
 }
 
 /** @param {"menu" | "sidebar"} mode */
 export async function applyLauncherMode(mode) {
   const launcherMode = normalizeLauncherMode(mode);
   if (launcherMode === "menu") {
-    await chrome.action.setPopup({ popup: POPUP_PATH });
+    // 先关闭「点击图标打开侧栏」，再恢复 popup，避免侧栏抢占工具栏点击
     await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
+    await chrome.action.setPopup({ popup: POPUP_PATH });
   } else {
     await chrome.action.setPopup({ popup: "" });
     await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
   }
   return launcherMode;
+}
+
+export function requestLauncherSyncFromBackground() {
+  return chrome.runtime.sendMessage({ type: "SYNC_LAUNCHER" }).catch(() => {});
+}
+
+export async function applyLauncherModeFromSettings(settings) {
+  return applyLauncherMode(resolveLauncherMode(settings));
 }
 
 /** 用户点击切换按钮时写入 settings.launcherMode */
@@ -30,50 +45,48 @@ export async function recordLauncherMode(mode) {
   return next;
 }
 
-function withCurrentWindow(fn) {
-  chrome.windows.getCurrent((win) => {
-    void chrome.runtime.lastError;
-    if (win?.id != null) fn(win.id);
-  });
-}
-
-function closeSidePanel(windowId) {
-  chrome.sidePanel.close({ windowId }, () => {
-    void chrome.runtime.lastError;
-    if (typeof window !== "undefined") window.close();
-  });
-}
-
 /** Side panel → menu mode (best-effort openPopup, then close side panel). */
-export function switchToMenuFromSidepanel() {
-  withCurrentWindow((windowId) => {
-    chrome.action.setPopup({ popup: POPUP_PATH }, () => {
-      void chrome.runtime.lastError;
-      chrome.action.openPopup({ windowId }, () => {
-        void chrome.runtime.lastError;
-        chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }, () => {
-          void chrome.runtime.lastError;
-          recordLauncherMode("menu").catch(() => {});
-          closeSidePanel(windowId);
-        });
-      });
-    });
-  });
+export async function switchToMenuFromSidepanel() {
+  const windowId = await resolveBrowserWindowIdForSidePanel();
+
+  if (windowId != null) {
+    try {
+      await chrome.action.openPopup({ windowId });
+    } catch {
+      /* user gesture or popup unavailable */
+    }
+  }
+
+  await recordLauncherMode("menu");
+  await applyLauncherMode("menu");
+
+  if (windowId != null) {
+    try {
+      await chrome.sidePanel.close({ windowId });
+    } catch {
+      /* */
+    }
+  }
+
+  window.close();
 }
 
 /** Popup → side panel list, then close popup. */
-export function switchToSidebarFromPopup() {
-  withCurrentWindow((windowId) => {
-    chrome.sidePanel.open({ windowId }, () => {
-      if (chrome.runtime.lastError) return;
-      chrome.action.setPopup({ popup: "" }, () => {
-        void chrome.runtime.lastError;
-        chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }, () => {
-          void chrome.runtime.lastError;
-          recordLauncherMode("sidebar").catch(() => {});
-          window.close();
-        });
-      });
-    });
-  });
+export async function switchToSidebarFromPopup() {
+  const settings = await getSettings();
+  if (isSidebarEmbedOpenMode(settings)) return;
+
+  const windowId = await resolveBrowserWindowIdForSidePanel();
+  if (windowId == null) return;
+
+  await recordLauncherMode("sidebar");
+  await applyLauncherMode("sidebar");
+
+  try {
+    await chrome.sidePanel.open({ windowId });
+  } catch {
+    /* user gesture or panel unavailable */
+  }
+
+  window.close();
 }

@@ -6,6 +6,56 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.6.0] — 2026-05-19
+
+### Added / 新增
+
+- **Experimental — side panel embed:** Settings → **Popout open mode** → **Side panel** opens popup-menu shortcuts in an iframe inside the side panel (default remains **Popout**)
+- Settings `!` tooltip: recommends Popout; warns that Side panel embed may break login / loading on some sites
+- Side panel **usage tips** (bulleted list below shortcuts): mobile/desktop switch, popout resume, Shift+click / right-click open from start
+- Embed view: loading indicator; `chrome-error://` detection with **Open in popout** fallback
+- Launcher list / popup: inline error when open fails (`errOpenFailed`, `errOpenNoWindow`, etc.)
+- Module `sidebar-embed.js`: session key `sidebarEmbed`, `prepareSidebarEmbedFromShortcut`, `syncOpenEmbedIfChanged`
+- Mobile UA for embed: DNR initiator rules + iframe viewport injection (`mobile-ua.js`)
+
+### Changed / 变更
+
+- When **Side panel** embed mode is on: toolbar icon **always opens popup menu** (`launcherMode` forced to `menu`); entries open in side panel iframe
+- Embed open path uses **session storage** only (no duplicate message/refresh); side panel list opens embed locally without background round-trip
+- `applyLauncherMode("menu")`: disable `openPanelOnActionClick` before restoring popup (fixes toolbar opening side panel instead of menu)
+- `background.js`: `SYNC_LAUNCHER`, `shouldSyncLauncherFromSettingsChange`, unified `webNavigation` handler
+- `shared.js`: in-memory storage read cache; `shouldHandleStorageUpdate` echo dedup unchanged
+- `popout.js`: skip ephemeral `__ctx__:` popouts in `removeStalePopouts`
+- `popup.js` / `sidepanel.js`: `boot()` wrapper (no top-level `await`)
+- Switching to embed mode closes existing popouts; leaving embed clears embed session and mobile UA rules
+
+### Fixed / 修复
+
+- Settings change to URL/mobile refreshes open embed iframe (`syncOpenEmbedIfChanged`)
+- Service worker restart restores embed mobile UA from session
+- `fromStart` no longer hides loading spinner mid-load (clear flag after iframe `load`)
+- Options/storage: avoid redundant list re-render on theme-only changes; launcher sync only when needed
+- Embed session not cleared on unrelated shortcut list updates
+
+### 新增（中文）
+
+- **实验性功能 — 侧栏内嵌：** 设置页「小窗打开方式」可选 **侧栏**，在侧栏 iframe 内打开（默认仍为 **小窗**）
+- 设置页 `!` 提示：建议优先小窗，非必要勿选侧栏；说明嵌入限制
+- 侧栏列表底部 **使用提示**（分条）：移动/桌面切换、小窗续看、Shift+从头打开
+- 内嵌视图：加载指示；`chrome-error://` 时显示「用小窗打开」
+- 打开失败行内提示；`sidebar-embed.js` 与 embed 移动 UA
+
+### 变更（中文）
+
+- 侧栏内嵌模式：工具栏固定 **弹出菜单**，入口在侧栏 iframe 打开；session 单通道同步；launcher API 调用顺序修复
+- 存储读缓存、SW 恢复 UA、切模式清理小窗/embed；popup/sidepanel 使用 `boot()`
+
+### 修复（中文）
+
+- 改 URL/移动版刷新 embed；`fromStart` loading 竞态；无关 storage 变更误清 embed session
+
+---
+
 ## [2.5.3] — 2026-05-19
 
 ### Changed / 变更
