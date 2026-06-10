@@ -6,6 +6,35 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.6.1] — 2026-05-19
+
+### Fixed / 修复
+
+- Side panel list → **Switch to popup menu** now persists `launcherMode` and syncs to Settings (Service Worker `SET_LAUNCHER_MODE`, no stale cache race)
+- `mergeSettings` / `mergeShortcuts`: **local storage wins** over stale sync (fixes settings/list reverting when sync write fails)
+- `storage.onChanged`: launcher sync uses `newValue` directly; sync echo deduped across multiple listeners
+- Options page: launcher mode applied only in background (no duplicate `setPopup` / `setPanelBehavior`)
+- Popup: single storage listener; switch-to-sidebar shows inline error on failure
+- Side panel: pin-to-toolbar hint when extension not pinned (sidebar list mode)
+- Embed iframe `load`: ignore stale load events when URL already changed
+
+### Changed / 变更
+
+- New module `browser-window.js` (decouple launcher from sidebar-embed)
+- Launcher list: re-run i18n only when locale changes
+
+### 修复（中文）
+
+- 侧栏列表「切换到弹出菜单」生效并同步设置页；local 优先于旧 sync
+- 设置页 launcher 仅由后台 SW 应用；popup 切换失败有提示；未 Pin 时显示工具栏提示
+- embed iframe 快速切换时避免误清 `fromStart`
+
+### 变更（中文）
+
+- 新增 `browser-window.js`；theme 变更不再全量刷新 i18n
+
+---
+
 ## [2.6.0] — 2026-05-19
 
 ### Added / 新增
