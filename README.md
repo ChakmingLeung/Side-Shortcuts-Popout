@@ -55,6 +55,12 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 2. Click a shortcut to open a popout; use the gear icon for settings
 3. **Export** your config before uninstall or device change
 
+### Migrating from Edge Sidebar
+
+Use [`tools/edge-sidebar-migrate`](tools/edge-sidebar-migrate/README.md) to
+export links from an Edge profile, or convert an already exported Edge sidebar
+link list into a backup JSON, then import it from **Options → Import → Merge**.
+
 ## 🖱️ Popout tips
 
 | Action | Effect |

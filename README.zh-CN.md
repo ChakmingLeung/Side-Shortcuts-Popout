@@ -55,6 +55,12 @@
 2. 点击侧栏入口在小窗打开；右上角 **齿轮** 进入设置
 3. 卸载或换电脑前，请在选项页 **导出配置** 以便恢复
 
+### 从 Edge 旧侧边栏迁移
+
+可以使用 [`tools/edge-sidebar-migrate`](tools/edge-sidebar-migrate/README.md)
+从 Edge Profile 直接导出旧侧边栏链接，或把已导出的链接列表转换成备份 JSON，
+再到扩展 **选项 → 导入 → 合并** 中恢复。
+
 ## 🖱️ 小窗操作
 
 | 操作 | 效果 |
