@@ -1,0 +1,77 @@
+[
+  {
+    "title": "Baimiao OCR",
+    "url": "https://web.baimiaoapp.com/",
+    "mobile": true
+  },
+  {
+    "title": "Metaso",
+    "url": "https://metaso.cn/",
+    "mobile": true
+  },
+  {
+    "title": "Perplexity",
+    "url": "https://www.perplexity.ai/",
+    "mobile": true
+  },
+  {
+    "title": "You.com",
+    "url": "https://you.com/?chatMode=default",
+    "mobile": true
+  },
+  {
+    "title": "Open API",
+    "url": "https://api.chatweb.plus/token",
+    "mobile": true
+  },
+  {
+    "title": "Manus",
+    "url": "https://manus.im/",
+    "mobile": true
+  },
+  {
+    "title": "GroqChat",
+    "url": "https://groq.com/",
+    "mobile": true
+  },
+  {
+    "title": "NotebookLM",
+    "url": "https://notebooklm.google.com/",
+    "mobile": true
+  },
+  {
+    "title": "Claude",
+    "url": "https://claude.ai/",
+    "mobile": true
+  },
+  {
+    "title": "ChatGPT",
+    "url": "https://chat.openai.com/",
+    "mobile": true
+  },
+  {
+    "title": "Gemini",
+    "url": "https://gemini.google.com/",
+    "mobile": true
+  },
+  {
+    "title": "Kimi",
+    "url": "https://kimi.moonshot.cn/chat/cr82hmu0atpf4t4p9kd0",
+    "mobile": true
+  },
+  {
+    "title": "MiniMax",
+    "url": "https://agent.minimaxi.com/",
+    "mobile": true
+  },
+  {
+    "title": "DeepSeek",
+    "url": "https://chat.deepseek.com/",
+    "mobile": true
+  },
+  {
+    "title": "MiroMind",
+    "url": "https://dr.miromind.ai/",
+    "mobile": true
+  }
+]
