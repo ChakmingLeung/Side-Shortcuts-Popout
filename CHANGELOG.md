@@ -6,7 +6,7 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
-## [Unreleased]
+## [2.6.2] — 2026-06-10
 
 ### Added / 新增
 
