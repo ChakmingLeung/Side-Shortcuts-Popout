@@ -6,6 +6,8 @@ import {
   shouldHandleStorageUpdate,
   createShortcutIcon,
   escapeHtml,
+  normalizeUrl,
+  isValidUrl,
 } from "./shared.js";
 import {
   openSidePanelFromPopup,
@@ -74,15 +76,25 @@ export async function initLauncherList({
     menu.className = "shortcut-context-menu";
     menu.setAttribute("role", "menu");
 
-    const item = document.createElement("button");
-    item.type = "button";
-    item.className = "shortcut-context-menu-item";
-    item.textContent = t("openFromStart");
-    item.addEventListener("click", () => {
-      removeShortcutContextMenu();
+    function appendMenuItem(labelKey, onSelect) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "shortcut-context-menu-item";
+      item.textContent = t(labelKey);
+      item.addEventListener("click", () => {
+        removeShortcutContextMenu();
+        onSelect();
+      });
+      menu.append(item);
+    }
+
+    appendMenuItem("openFromStart", () => {
       openShortcut(shortcut, { fromStart: true });
     });
-    menu.append(item);
+    appendMenuItem("openInTab", () => {
+      openShortcutInTab(shortcut);
+    });
+
     document.body.append(menu);
     shortcutContextMenu = menu;
 
@@ -90,6 +102,20 @@ export async function initLauncherList({
     const rect = menu.getBoundingClientRect();
     menu.style.left = `${Math.max(pad, Math.min(clientX, window.innerWidth - rect.width - pad))}px`;
     menu.style.top = `${Math.max(pad, Math.min(clientY, window.innerHeight - rect.height - pad))}px`;
+  }
+
+  async function openShortcutInTab(shortcut) {
+    hideOpenError();
+    if (!isValidUrl(shortcut.url)) {
+      showOpenError("errUrlInvalid");
+      return;
+    }
+    const url = normalizeUrl(shortcut.url);
+    try {
+      await chrome.tabs.create({ url, active: true });
+    } catch {
+      showOpenError("errOpenFailed");
+    }
   }
 
   document.addEventListener("click", () => removeShortcutContextMenu());

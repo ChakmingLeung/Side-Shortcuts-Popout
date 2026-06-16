@@ -6,6 +6,28 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [Unreleased]
+
+### Added / 新增
+
+- Shortcut list context menu: **Open in tab** (opens the configured start URL in a new browser tab)
+- Permission `tabs` (required for creating tabs from the side panel / popup list)
+
+### Fixed / 修复
+
+- **Open in tab**: validate URL with `isValidUrl` before `chrome.tabs.create`; show inline error for invalid URLs
+
+### 新增（中文）
+
+- 快捷入口列表右键菜单：**在标签页打开**
+- 权限 `tabs`（侧栏/弹出菜单列表中创建标签页所需）
+
+### 修复（中文）
+
+- 「在标签页打开」：创建标签前校验网址，无效时显示行内错误提示
+
+---
+
 ## [2.6.1] — 2026-05-19
 
 ### Fixed / 修复
