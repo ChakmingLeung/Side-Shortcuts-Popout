@@ -82,7 +82,7 @@ const MESSAGES = {
     openModeTipsTitle: "使用提示",
     openModeTipsItem1:
       "若打开页面未如理想，请在设置中将该入口切换打开方式（移动版 / 桌面版）后重新打开。",
-    openModeTipsItem2: "关闭小窗后再点可续看上次页面。",
+    openModeTipsItem2: "关闭小窗后再点可续看上次页面（含位置与大小）。",
     openModeTipsItem3: "Shift+点击或右键选择「从头打开」回到起始网址。",
     openFromStart: "从头打开（起始网址）",
     openFromStartShift: "Shift+点击：从头打开起始网址",
@@ -179,7 +179,8 @@ const MESSAGES = {
     openModeTipsTitle: "Tips",
     openModeTipsItem1:
       "If a page doesn't look right, switch that shortcut to Mobile or Desktop in Settings, then open it again.",
-    openModeTipsItem2: "After closing a popout, click again to resume where you left off.",
+    openModeTipsItem2:
+      "After closing a popout, click again to resume the page, position, and size.",
     openModeTipsItem3: "Shift+click or right-click → Open start URL to return to the configured start URL.",
     openFromStart: "Open start URL",
     openFromStartShift: "Shift+click: open configured start URL",

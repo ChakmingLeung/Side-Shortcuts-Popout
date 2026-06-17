@@ -6,6 +6,28 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.6.3] — 2026-05-19
+
+### Added / 新增
+
+- Popout resume: after closing a popout, reopening restores **window position and size** in addition to URL (same browser session, `chrome.storage.session`)
+
+### Fixed / 修复
+
+- Settings **mobile/desktop** change: already-open popouts get the new default width again (UA + page reload unchanged)
+- Initial popout layout is saved on create so default-size windows can resume position/size without dragging first
+
+### 新增（中文）
+
+- 小窗续看：关窗后再点除恢复 URL 外，还恢复**上次小窗位置与大小**（同一次浏览器会话）
+
+### 修复（中文）
+
+- 设置里切换**移动/桌面**时，已打开的小窗会恢复对应默认宽度
+- 新建小窗时即写入初始位置与大小，未拖动过也能续看布局
+
+---
+
 ## [2.6.2] — 2026-06-10
 
 ### Added / 新增

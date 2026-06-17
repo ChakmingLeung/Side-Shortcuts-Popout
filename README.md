@@ -7,7 +7,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.6.2-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.3-blue.svg)](CHANGELOG.md)
 
 A browser extension that lists customizable web shortcuts in the native Chromium **Side Panel**—click to open in a **popout window** beside the main window, with normal cookies and login. Useful when [Microsoft Edge retires the built-in App Tower sidebar](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge).
 
@@ -17,7 +17,7 @@ A browser extension that lists customizable web shortcuts in the native Chromium
 |---------|-------------|
 | Shortcuts | Custom name & URL; favicon from site |
 | Popout | Opens in an independent window; multiple popouts supported |
-| Resume | Focus without reload if still open; restore last URL in same browser session after close |
+| Resume | Focus without reload if still open; restore last URL, position, and size in same browser session after close |
 | Open from start | **Shift+click** or context **Open start URL** |
 | Open in tab | Context **Open in tab** → new tab with start URL (normal tab cookies/login) |
 | Mobile / desktop | Per-entry; mobile uses Android UA + 375px + viewport |
@@ -66,7 +66,7 @@ link list into a backup JSON, then import it from **Options → Import → Merge
 
 | Action | Effect |
 |--------|--------|
-| Normal click | Open popout; after close, restore last URL in this session when possible |
+| Normal click | Open popout; after close, restore last URL, position, and size in this session when possible |
 | Click while popout open | Focus only, no reload |
 | **Shift+click** / **right-click Open start URL** | Load configured start URL |
 | **Right-click Open in tab** | Open start URL in a new browser tab |
@@ -99,7 +99,7 @@ The side panel list includes **usage tips** below the shortcuts (mobile/desktop,
 ## ⚠️ Known limitations
 
 - Popups may be blocked by browser policy; if blocked, allow popups in the site’s permissions
-- **Resume** restores URL only, not scroll or form state; session clears when the browser closes
+- **Resume** restores URL, window position, and size—not scroll or form state; session clears when the browser closes
 - Popouts cannot be forced “always on top”
 
 ## 🔒 Privacy

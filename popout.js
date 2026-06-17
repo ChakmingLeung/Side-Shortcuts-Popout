@@ -12,10 +12,13 @@ import {
 } from "./mobile-ua.js";
 import {
   getResumeUrl,
+  getResumeBounds,
   clearResumeUrl,
   isValidResumeUrl,
-  persistResumeFromTab,
+  persistResumeFromPopout,
   setResumeUrl,
+  setResumeBounds,
+  RESUME_FLUSH_MS,
 } from "./popout-resume.js";
 
 const POPOUT_WIDTH_DESKTOP = 420;
@@ -27,6 +30,8 @@ const POPOUT_CASCADE = 28;
 const popoutWindows = new Map();
 /** @type {Map<number, string>} */
 const tabIdToShortcutId = new Map();
+/** @type {Map<string, ReturnType<typeof setTimeout>>} */
+const boundsFlushTimers = new Map();
 
 function popoutWidth(mobile) {
   return mobile ? MOBILE_VIEWPORT_WIDTH : POPOUT_WIDTH_DESKTOP;
@@ -64,6 +69,36 @@ function getPopoutLayout(openCount, anchorWindow, mobile) {
   };
 }
 
+async function resolvePopoutLayout(openCount, anchorWindow, mobile, shortcutId, fromStart) {
+  if (!fromStart) {
+    const saved = await getResumeBounds(shortcutId);
+    if (saved) return saved;
+  }
+  return getPopoutLayout(openCount, anchorWindow, mobile);
+}
+
+function clearBoundsFlushTimer(shortcutId) {
+  const prev = boundsFlushTimers.get(shortcutId);
+  if (prev == null) return;
+  clearTimeout(prev);
+  boundsFlushTimers.delete(shortcutId);
+}
+
+function scheduleBoundsPersist(shortcutId, windowId) {
+  clearBoundsFlushTimer(shortcutId);
+  boundsFlushTimers.set(
+    shortcutId,
+    setTimeout(() => {
+      boundsFlushTimers.delete(shortcutId);
+      if (!popoutWindows.has(shortcutId)) return;
+      chrome.windows
+        .get(windowId)
+        .then((win) => setResumeBounds(shortcutId, win))
+        .catch(() => {});
+    }, RESUME_FLUSH_MS)
+  );
+}
+
 async function countOpenPopouts() {
   let count = 0;
   for (const [shortcutId, { windowId, tabId }] of popoutWindows) {
@@ -71,6 +106,7 @@ async function countOpenPopouts() {
       await chrome.windows.get(windowId);
       count++;
     } catch {
+      clearBoundsFlushTimer(shortcutId);
       clearMobileUserAgentForTab(tabId).catch(() => {});
       unbindPopoutTab(tabId);
       popoutWindows.delete(shortcutId);
@@ -82,7 +118,8 @@ async function countOpenPopouts() {
 function untrackWindow(windowId) {
   for (const [shortcutId, info] of popoutWindows) {
     if (info.windowId !== windowId) continue;
-    persistResumeFromTab(shortcutId, info.tabId).catch(() => {});
+    clearBoundsFlushTimer(shortcutId);
+    persistResumeFromPopout(shortcutId, info.tabId, info.windowId).catch(() => {});
     clearMobileUserAgentForTab(info.tabId).catch(() => {});
     unbindPopoutTab(info.tabId);
     popoutWindows.delete(shortcutId);
@@ -90,6 +127,14 @@ function untrackWindow(windowId) {
 }
 
 chrome.windows.onRemoved.addListener(untrackWindow);
+
+chrome.windows.onBoundsChanged.addListener((window) => {
+  for (const [shortcutId, info] of popoutWindows) {
+    if (info.windowId !== window.id) continue;
+    scheduleBoundsPersist(shortcutId, window.id);
+    break;
+  }
+});
 
 export function handlePopoutNavigationCommitted(details) {
   if (details.frameId !== 0) return;
@@ -125,8 +170,15 @@ export async function syncOpenPopoutsIfChanged(prevList, nextList) {
   const prevById = new Map(prevList.map((s) => [s.id, s]));
   for (const next of nextList) {
     if (!popoutWindows.has(next.id)) continue;
-    if (!shortcutOpenConfigChanged(prevById.get(next.id), next)) continue;
-    await openShortcutPopout(next, { updateLastShortcut: false, reload: true });
+    const prev = prevById.get(next.id);
+    if (!shortcutOpenConfigChanged(prev, next)) continue;
+    const mobileChanged =
+      prev != null && shouldUseMobile(prev) !== shouldUseMobile(next);
+    await openShortcutPopout(next, {
+      updateLastShortcut: false,
+      reload: true,
+      resetMobileWidth: mobileChanged,
+    });
   }
 }
 
@@ -141,11 +193,16 @@ async function configureTabForLoad(tabId, loadUrl, mobile) {
 
 /**
  * @param {{ id: string, url: string, mobile?: boolean | null }} shortcut
- * @param {{ updateLastShortcut?: boolean, reload?: boolean, fromStart?: boolean }} [options]
+ * @param {{ updateLastShortcut?: boolean, reload?: boolean, fromStart?: boolean, resetMobileWidth?: boolean }} [options]
  */
 export async function openShortcutPopout(
   shortcut,
-  { updateLastShortcut = true, reload = false, fromStart = false } = {}
+  {
+    updateLastShortcut = true,
+    reload = false,
+    fromStart = false,
+    resetMobileWidth = false,
+  } = {}
 ) {
   const { loadUrl, mobile } = resolveLoadUrl(shortcut);
 
@@ -160,11 +217,23 @@ export async function openShortcutPopout(
       const win = await chrome.windows.get(existing.windowId, { populate: true });
       const tabId = win.tabs?.[0]?.id ?? existing.tabId;
       if (tabId != null) {
-        await chrome.windows.update(existing.windowId, {
-          width: popoutWidth(mobile),
-          height: POPOUT_HEIGHT,
-          focused: true,
-        });
+        if (fromStart) {
+          let anchorWindow;
+          try {
+            anchorWindow = await chrome.windows.getLastFocused();
+          } catch {
+            /* no focused window */
+          }
+          const layout = getPopoutLayout(0, anchorWindow, mobile);
+          await chrome.windows.update(existing.windowId, { ...layout, focused: true });
+        } else if (resetMobileWidth) {
+          await chrome.windows.update(existing.windowId, {
+            width: popoutWidth(mobile),
+            focused: true,
+          });
+        } else {
+          await chrome.windows.update(existing.windowId, { focused: true });
+        }
         if (reload || fromStart) {
           await configureTabForLoad(tabId, loadUrl, mobile);
         } else {
@@ -191,7 +260,13 @@ export async function openShortcutPopout(
   } catch {
     /* no focused window */
   }
-  const layout = getPopoutLayout(openCount, anchorWindow, mobile);
+  const layout = await resolvePopoutLayout(
+    openCount,
+    anchorWindow,
+    mobile,
+    shortcut.id,
+    fromStart
+  );
   const created = await chrome.windows.create({
     url: "about:blank",
     type: "popup",
@@ -204,6 +279,7 @@ export async function openShortcutPopout(
   if (windowId != null && tabId != null) {
     await configureTabForLoad(tabId, urlToLoad, mobile);
     bindPopoutTab(shortcut.id, windowId, tabId);
+    setResumeBounds(shortcut.id, layout).catch(() => {});
   }
 
   if (updateLastShortcut) await setLastShortcutId(shortcut.id);

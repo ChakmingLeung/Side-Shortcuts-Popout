@@ -1,9 +1,14 @@
-import { isValidUrl, normalizeUrl } from "./shared.js";
+import { isValidUrl, normalizeUrl, shouldUseMobile } from "./shared.js";
 
 const SESSION_KEY = "popoutResume";
-const FLUSH_MS = 250;
+export const RESUME_FLUSH_MS = 250;
+const FLUSH_MS = RESUME_FLUSH_MS;
+const MIN_POPOUT_WIDTH = 200;
+const MIN_POPOUT_HEIGHT = 200;
+const MAX_POPOUT_WIDTH = 2000;
+const MAX_POPOUT_HEIGHT = 2000;
 
-/** @type {Record<string, { url: string }> | null} */
+/** @type {Record<string, { url?: string, left?: number, top?: number, width?: number, height?: number }> | null} */
 let resumeMap = null;
 /** @type {ReturnType<typeof setTimeout> | null} */
 let resumeFlushTimer = null;
@@ -11,6 +16,39 @@ let resumeFlushTimer = null;
 /** @returns {boolean} */
 export function isValidResumeUrl(url) {
   return typeof url === "string" && isValidUrl(url);
+}
+
+/**
+ * @param {{ left?: unknown, top?: unknown, width?: unknown, height?: unknown }} entry
+ * @returns {{ left: number, top: number, width: number, height: number } | null}
+ */
+export function normalizeResumeBounds(entry) {
+  if (!entry || typeof entry !== "object") return null;
+  const { left, top, width, height } = entry;
+  if (
+    typeof left !== "number" ||
+    typeof top !== "number" ||
+    typeof width !== "number" ||
+    typeof height !== "number" ||
+    !Number.isFinite(left) ||
+    !Number.isFinite(top) ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height)
+  ) {
+    return null;
+  }
+  const clampedWidth = Math.round(
+    Math.min(MAX_POPOUT_WIDTH, Math.max(MIN_POPOUT_WIDTH, width))
+  );
+  const clampedHeight = Math.round(
+    Math.min(MAX_POPOUT_HEIGHT, Math.max(MIN_POPOUT_HEIGHT, height))
+  );
+  return {
+    left: Math.round(left),
+    top: Math.round(top),
+    width: clampedWidth,
+    height: clampedHeight,
+  };
 }
 
 async function loadResumeMapFromSession() {
@@ -53,11 +91,38 @@ export async function getResumeUrl(shortcutId) {
   return isValidResumeUrl(url) ? url : null;
 }
 
+/** @returns {Promise<{ left: number, top: number, width: number, height: number } | null>} */
+export async function getResumeBounds(shortcutId) {
+  if (!shortcutId) return null;
+  const map = await ensureResumeMap();
+  return normalizeResumeBounds(map[shortcutId]);
+}
+
 export async function setResumeUrl(shortcutId, url) {
   if (!shortcutId || !isValidResumeUrl(url)) return;
   const map = await ensureResumeMap();
-  if (map[shortcutId]?.url === url) return;
-  map[shortcutId] = { url };
+  const prev = map[shortcutId] ?? {};
+  if (prev.url === url) return;
+  map[shortcutId] = { ...prev, url };
+  scheduleResumeFlush();
+}
+
+export async function setResumeBounds(shortcutId, bounds) {
+  if (!shortcutId) return;
+  const normalized = normalizeResumeBounds(bounds);
+  if (!normalized) return;
+  const map = await ensureResumeMap();
+  const prev = map[shortcutId] ?? {};
+  const next = { ...prev, ...normalized };
+  if (
+    prev.left === next.left &&
+    prev.top === next.top &&
+    prev.width === next.width &&
+    prev.height === next.height
+  ) {
+    return;
+  }
+  map[shortcutId] = next;
   scheduleResumeFlush();
 }
 
@@ -69,7 +134,7 @@ export async function clearResumeUrl(shortcutId) {
   await flushResumeMap();
 }
 
-/** 删除入口后清理 session 中的续看 URL */
+/** 删除入口后清理 session 中的续看缓存 */
 export async function pruneResumeUrls(validIds) {
   const valid = new Set(validIds);
   const map = await ensureResumeMap();
@@ -82,28 +147,38 @@ export async function pruneResumeUrls(validIds) {
   if (changed) await flushResumeMap();
 }
 
-/** 设置里改了起始 URL 时清续看缓存 */
+/** 设置里改了起始 URL 或移动/桌面时清续看缓存 */
 export async function clearResumeOnUrlChange(prevList, nextList) {
   if (!Array.isArray(prevList) || !Array.isArray(nextList)) return;
   const prevById = new Map(prevList.map((s) => [s.id, s]));
   for (const next of nextList) {
     const prev = prevById.get(next.id);
     if (!prev) continue;
-    if (normalizeUrl(prev.url) !== normalizeUrl(next.url)) {
+    if (
+      normalizeUrl(prev.url) !== normalizeUrl(next.url) ||
+      shouldUseMobile(prev) !== shouldUseMobile(next)
+    ) {
       await clearResumeUrl(next.id);
     }
   }
 }
 
-export async function persistResumeFromTab(shortcutId, tabId) {
-  if (!shortcutId || tabId == null) return;
+export async function persistResumeFromPopout(shortcutId, tabId, windowId) {
+  if (!shortcutId || tabId == null || windowId == null) return;
   try {
-    const tab = await chrome.tabs.get(tabId);
-    if (!isValidResumeUrl(tab.url)) return;
+    const [tab, win] = await Promise.all([
+      chrome.tabs.get(tabId),
+      chrome.windows.get(windowId),
+    ]);
     const map = await ensureResumeMap();
-    map[shortcutId] = { url: tab.url };
+    const next = { ...(map[shortcutId] ?? {}) };
+    if (isValidResumeUrl(tab.url)) next.url = tab.url;
+    const bounds = normalizeResumeBounds(win);
+    if (bounds) Object.assign(next, bounds);
+    if (!next.url && !bounds) return;
+    map[shortcutId] = next;
     await flushResumeMap();
   } catch {
-    /* tab 已关闭 */
+    /* 窗口或标签已关闭 */
   }
 }
