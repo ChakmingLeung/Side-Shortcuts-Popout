@@ -24,6 +24,13 @@ npm-debug.log*
 /for store/
 /icons/icon300.png
 
+# Store-only — update notes (not on GitHub)
+whats-new.html
+whats-new.css
+whats-new.js
+whats-new-i18n.js
+whats-new-launch.js
+
 # Development process — local only
 /docs/
 /scripts/
