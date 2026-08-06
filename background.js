@@ -146,6 +146,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       } else {
         await openShortcutPopout(shortcut, {
           fromStart: Boolean(message.fromStart),
+          focused: true,
+          raiseStack: Boolean(message.raisePopoutStack),
         });
       }
       sendResponse({ ok: true });
@@ -278,7 +280,9 @@ async function initOnFirstInstall() {
   await seedDefaultShortcutsLocal();
 }
 
-bootstrapServiceWorker().catch(() => {});
+bootstrapServiceWorker().catch((err) => {
+  console.error("[background] bootstrap failed:", err);
+});
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   try {
@@ -286,7 +290,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       await initOnFirstInstall();
     }
     await bootstrapServiceWorker();
-  } catch {
-    /* install/update setup failed */
+  } catch (err) {
+    console.error("[background] onInstalled failed:", err);
   }
 });

@@ -7,7 +7,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.6.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.4-blue.svg)](CHANGELOG.md)
 
 在 Microsoft Edge [逐步下线内置侧边栏 App Tower](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge) 的背景下，本扩展通过浏览器原生 **Side Panel（侧边栏）** API，纵向列出可配置的网页快捷入口；**点击即在独立小窗打开**，与主窗口并排浏览，登录态与常规标签页一致。
 
@@ -66,12 +66,13 @@
 
 | 操作 | 效果 |
 |------|------|
-| 普通点击 | 开小窗；关窗后再点尽量恢复上次 URL、位置与大小（同一次浏览器会话） |
-| 小窗仍开着时再点 | 只聚焦，不刷新 |
+| 普通点击 | 开小窗并叠在已有小窗之上；关窗后再点尽量恢复上次 URL、位置与大小（同一次浏览器会话） |
+| 小窗仍开着时再点 | 聚焦并置顶该小窗，不刷新 |
+| **中键点击** | 与左键相同地打开/置顶叠窗（侧栏不收起；弹出菜单会收起） |
 | **Shift+点击** / **右键从头打开** | 加载起始网址 |
 | **右键在标签页打开** | 在新标签页打开起始网址 |
 
-侧栏列表底部有 **使用提示**（移动/桌面、续看、从头打开、标签页打开）。若设置里选了 **侧栏打开网页**，弹出菜单点入口会在侧栏 iframe 打开，工具栏图标固定为弹出菜单。
+侧栏列表底部有 **使用提示**（移动/桌面、续看、从头打开、标签页打开、中键）。若设置里选了 **侧栏打开网页**，弹出菜单点入口会在侧栏 iframe 打开，工具栏图标固定为弹出菜单。
 
 ## 🧪 侧栏打开网页（实验性，v2.6.0）
 

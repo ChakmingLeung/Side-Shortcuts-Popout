@@ -20,10 +20,10 @@ import {
   setResumeBounds,
   RESUME_FLUSH_MS,
 } from "./popout-resume.js";
+import { resolveAnchorBrowserWindow } from "./browser-window.js";
 
 const POPOUT_WIDTH_DESKTOP = 420;
 const POPOUT_HEIGHT = 720;
-const POPOUT_EDGE = 12;
 const POPOUT_CASCADE = 28;
 
 /** @type {Map<string, { windowId: number, tabId: number }>} */
@@ -48,24 +48,28 @@ function unbindPopoutTab(tabId) {
 
 function getPopoutLayout(openCount, anchorWindow, mobile) {
   const width = popoutWidth(mobile);
-  let left = 100 + openCount * POPOUT_CASCADE;
-  let top = 32 + openCount * POPOUT_CASCADE;
+  const height = POPOUT_HEIGHT;
+  const cascade = openCount * POPOUT_CASCADE;
+  let left = 100 + cascade;
+  let top = 32 + cascade;
 
   if (anchorWindow?.width && anchorWindow.left != null) {
     left =
-      anchorWindow.left +
-      anchorWindow.width -
-      width -
-      POPOUT_EDGE -
-      openCount * POPOUT_CASCADE;
-    top = (anchorWindow.top ?? 0) + 32 + openCount * POPOUT_CASCADE;
+      Math.round(anchorWindow.left + (anchorWindow.width - width) / 2) + cascade;
+    if (anchorWindow.height != null) {
+      top =
+        Math.round((anchorWindow.top ?? 0) + (anchorWindow.height - height) / 2) +
+        cascade;
+    } else {
+      top = (anchorWindow.top ?? 0) + 32 + cascade;
+    }
   }
 
   return {
     left: Math.max(8, left),
     top: Math.max(0, top),
     width,
-    height: POPOUT_HEIGHT,
+    height,
   };
 }
 
@@ -113,6 +117,26 @@ async function countOpenPopouts() {
     }
   }
   return count;
+}
+
+/**
+ * 将已打开小窗提到浏览器之上；`topWindowId` 最后聚焦叠在最上面。
+ * 仅有一个小窗时直接返回（创建时已 focused）。
+ * @param {number | null | undefined} topWindowId
+ */
+export async function raiseOpenPopouts(topWindowId) {
+  const otherIds = [];
+  for (const [, { windowId }] of popoutWindows) {
+    if (windowId !== topWindowId) otherIds.push(windowId);
+  }
+  if (otherIds.length === 0) return;
+
+  await Promise.all(
+    otherIds.map((id) => chrome.windows.update(id, { focused: true }).catch(() => {}))
+  );
+  if (topWindowId != null) {
+    await chrome.windows.update(topWindowId, { focused: true }).catch(() => {});
+  }
 }
 
 function untrackWindow(windowId) {
@@ -193,7 +217,7 @@ async function configureTabForLoad(tabId, loadUrl, mobile) {
 
 /**
  * @param {{ id: string, url: string, mobile?: boolean | null }} shortcut
- * @param {{ updateLastShortcut?: boolean, reload?: boolean, fromStart?: boolean, resetMobileWidth?: boolean }} [options]
+ * @param {{ updateLastShortcut?: boolean, reload?: boolean, fromStart?: boolean, resetMobileWidth?: boolean, focused?: boolean, raiseStack?: boolean }} [options]
  */
 export async function openShortcutPopout(
   shortcut,
@@ -202,6 +226,8 @@ export async function openShortcutPopout(
     reload = false,
     fromStart = false,
     resetMobileWidth = false,
+    focused = true,
+    raiseStack = false,
   } = {}
 ) {
   const { loadUrl, mobile } = resolveLoadUrl(shortcut);
@@ -209,6 +235,12 @@ export async function openShortcutPopout(
   if (fromStart) {
     await clearResumeUrl(shortcut.id);
   }
+
+  const finish = async (windowId, reused) => {
+    if (updateLastShortcut) await setLastShortcutId(shortcut.id);
+    if (raiseStack && windowId != null) await raiseOpenPopouts(windowId);
+    return { windowId, reused };
+  };
 
   const existing = popoutWindows.get(shortcut.id);
 
@@ -218,21 +250,16 @@ export async function openShortcutPopout(
       const tabId = win.tabs?.[0]?.id ?? existing.tabId;
       if (tabId != null) {
         if (fromStart) {
-          let anchorWindow;
-          try {
-            anchorWindow = await chrome.windows.getLastFocused();
-          } catch {
-            /* no focused window */
-          }
+          const anchorWindow = await resolveAnchorBrowserWindow();
           const layout = getPopoutLayout(0, anchorWindow, mobile);
-          await chrome.windows.update(existing.windowId, { ...layout, focused: true });
+          await chrome.windows.update(existing.windowId, { ...layout, focused });
         } else if (resetMobileWidth) {
           await chrome.windows.update(existing.windowId, {
             width: popoutWidth(mobile),
-            focused: true,
+            focused,
           });
         } else {
-          await chrome.windows.update(existing.windowId, { focused: true });
+          await chrome.windows.update(existing.windowId, { focused });
         }
         if (reload || fromStart) {
           await configureTabForLoad(tabId, loadUrl, mobile);
@@ -241,10 +268,9 @@ export async function openShortcutPopout(
         }
         bindPopoutTab(shortcut.id, existing.windowId, tabId);
       } else {
-        await chrome.windows.update(existing.windowId, { focused: true });
+        await chrome.windows.update(existing.windowId, { focused });
       }
-      if (updateLastShortcut) await setLastShortcutId(shortcut.id);
-      return { windowId: existing.windowId, reused: true };
+      return finish(existing.windowId, true);
     } catch {
       clearMobileUserAgentForTab(existing.tabId).catch(() => {});
       unbindPopoutTab(existing.tabId);
@@ -254,12 +280,7 @@ export async function openShortcutPopout(
 
   const urlToLoad = fromStart ? loadUrl : (await getResumeUrl(shortcut.id)) ?? loadUrl;
   const openCount = await countOpenPopouts();
-  let anchorWindow;
-  try {
-    anchorWindow = await chrome.windows.getLastFocused();
-  } catch {
-    /* no focused window */
-  }
+  const anchorWindow = await resolveAnchorBrowserWindow();
   const layout = await resolvePopoutLayout(
     openCount,
     anchorWindow,
@@ -270,11 +291,11 @@ export async function openShortcutPopout(
   const created = await chrome.windows.create({
     url: "about:blank",
     type: "popup",
-    focused: true,
+    focused,
     ...layout,
   });
 
-  const windowId = created?.id;
+  const windowId = created?.id ?? null;
   const tabId = created?.tabs?.[0]?.id;
   if (windowId != null && tabId != null) {
     await configureTabForLoad(tabId, urlToLoad, mobile);
@@ -282,6 +303,5 @@ export async function openShortcutPopout(
     setResumeBounds(shortcut.id, layout).catch(() => {});
   }
 
-  if (updateLastShortcut) await setLastShortcutId(shortcut.id);
-  return { windowId: windowId ?? null, reused: false };
+  return finish(windowId, false);
 }

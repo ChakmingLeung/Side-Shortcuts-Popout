@@ -129,7 +129,7 @@ export async function initLauncherList({
     });
   }
 
-  async function openShortcut(shortcut, { fromStart = false } = {}) {
+  async function openShortcut(shortcut, { fromStart = false, keepOpen = false } = {}) {
     hideOpenError();
     try {
       const settings = await getSettings();
@@ -140,7 +140,7 @@ export async function initLauncherList({
           await prepareSidebarEmbedFromShortcut(shortcut, { fromStart });
           if (!isSidebar) {
             await openSidePanelFromPopup();
-            if (closeOnOpen) window.close();
+            if (closeOnOpen && !keepOpen) window.close();
           } else {
             lastOpenedId = shortcut.id;
             highlightActive(shortcut.id);
@@ -159,6 +159,8 @@ export async function initLauncherList({
         type: "OPEN_SHORTCUT",
         shortcutId: shortcut.id,
         fromStart,
+        // 列表打开小窗时抬起整叠（侧栏任意点击、弹出菜单中键；仅一个窗时 raise 为空操作）
+        raisePopoutStack: isSidebar || keepOpen,
         source: isSidebar ? "sidebar" : "popup",
       });
       if (!res?.ok) {
@@ -170,7 +172,7 @@ export async function initLauncherList({
       if (isSidebar) {
         lastOpenedId = shortcut.id;
         highlightActive(shortcut.id);
-      } else if (closeOnOpen) {
+      } else if (closeOnOpen && !keepOpen) {
         window.close();
       }
     } catch {
@@ -191,7 +193,8 @@ export async function initLauncherList({
       btn.type = "button";
       btn.className = "shortcut-btn";
       if (isSidebar) btn.dataset.id = item.id;
-      btn.title = `${item.title}\n${t("openFromStartShift")}`;
+      const tipLines = [item.title, t("openFromStartShift"), t("openMiddleClick")];
+      btn.title = tipLines.join("\n");
       btn.setAttribute("aria-label", item.title);
 
       if (isSidebar) {
@@ -208,6 +211,14 @@ export async function initLauncherList({
 
       btn.addEventListener("click", (e) => {
         openShortcut(item, { fromStart: e.shiftKey });
+      });
+      btn.addEventListener("auxclick", (e) => {
+        if (e.button !== 1) return;
+        e.preventDefault();
+        openShortcut(item, { fromStart: e.shiftKey, keepOpen: true });
+      });
+      btn.addEventListener("mousedown", (e) => {
+        if (e.button === 1) e.preventDefault();
       });
       btn.addEventListener("contextmenu", (e) => {
         e.preventDefault();

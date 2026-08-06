@@ -7,7 +7,7 @@
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-green.svg)](manifest.json)
 [![Chrome 114+](https://img.shields.io/badge/Chrome-114%2B-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
 [![Edge 114+](https://img.shields.io/badge/Edge-114%2B-0078D4?logo=microsoftedge&logoColor=white)](https://learn.microsoft.com/microsoft-edge/extensions-chromium/)
-[![Version](https://img.shields.io/badge/version-2.6.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.4-blue.svg)](CHANGELOG.md)
 
 A browser extension that lists customizable web shortcuts in the native Chromium **Side Panel**—click to open in a **popout window** beside the main window, with normal cookies and login. Useful when [Microsoft Edge retires the built-in App Tower sidebar](https://support.microsoft.com/en-US/edge/streamline-access-to-your-favorite-sites-and-apps-with-sidebar-in-microsoft-edge).
 
@@ -66,12 +66,13 @@ link list into a backup JSON, then import it from **Options → Import → Merge
 
 | Action | Effect |
 |--------|--------|
-| Normal click | Open popout; after close, restore last URL, position, and size in this session when possible |
-| Click while popout open | Focus only, no reload |
+| Normal click | Open popout on top of existing ones; after close, restore last URL, position, and size in this session when possible |
+| Click while popout open | Focus and raise that popout, no reload |
+| **Middle-click** | Same open/stack-on-top as left-click (side panel stays open; popup menu closes) |
 | **Shift+click** / **right-click Open start URL** | Load configured start URL |
 | **Right-click Open in tab** | Open start URL in a new browser tab |
 
-The side panel list includes **usage tips** below the shortcuts (mobile/desktop, resume, open from start, open in tab). With **open page in side panel** enabled, popup menu clicks open sites in a side-panel iframe; the toolbar icon stays on the popup menu.
+The side panel list includes **usage tips** below the shortcuts (mobile/desktop, resume, open from start, open in tab, middle-click). With **open page in side panel** enabled, popup menu clicks open sites in a side-panel iframe; the toolbar icon stays on the popup menu.
 
 ## 🧪 Open page in side panel (experimental, v2.6.0)
 

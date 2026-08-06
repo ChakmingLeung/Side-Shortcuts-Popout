@@ -6,6 +6,28 @@ All notable changes to this project are documented here. Version numbers match `
 
 ---
 
+## [2.6.4] — 2026-08-06
+
+### Changed / 变更
+
+- New popouts open **centered** in the main browser window (was anchored to the right edge)
+- Popout layout anchor uses a **normal** browser window, so opening from the toolbar popup menu no longer keys off the tiny popup
+
+### Added / 新增
+
+- Popup menu / side panel: opening a popout (side panel left/middle-click, or popup middle-click) raises the whole popout stack above the browser (newest on top)
+
+### 变更（中文）
+
+- 新建小窗在主浏览器窗口**居中**打开（此前贴在右侧）
+- 布局锚点改为 **normal** 浏览器窗口，从工具栏弹出菜单打开时不再以小 popup 为参照
+
+### 新增（中文）
+
+- 侧栏左键/中键、弹出菜单中键：打开小窗后把整叠提到浏览器之上（后开在最上）
+
+---
+
 ## [2.6.3] — 2026-05-19
 
 ### Added / 新增

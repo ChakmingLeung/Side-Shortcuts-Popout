@@ -84,8 +84,11 @@ const MESSAGES = {
       "若打开页面未如理想，请在设置中将该入口切换打开方式（移动版 / 桌面版）后重新打开。",
     openModeTipsItem2: "关闭小窗后再点可续看上次页面（含位置与大小）。",
     openModeTipsItem3: "Shift+点击或右键选择「从头打开」回到起始网址。",
+    openModeTipsItem4:
+      "弹出菜单中可用鼠标中键打开入口；会把已有小窗一起提到前面，后开的在最上（菜单会收起）。",
     openFromStart: "从头打开（起始网址）",
     openFromStartShift: "Shift+点击：从头打开起始网址",
+    openMiddleClick: "中键点击：打开并叠在已有小窗上面",
     openInTab: "在标签页打开",
     emptyState: "还没有快捷入口。",
     emptyAddFirst: "去添加",
@@ -182,8 +185,11 @@ const MESSAGES = {
     openModeTipsItem2:
       "After closing a popout, click again to resume the page, position, and size.",
     openModeTipsItem3: "Shift+click or right-click → Open start URL to return to the configured start URL.",
+    openModeTipsItem4:
+      "In the popup menu, middle-click opens a shortcut and raises existing popouts above the browser (newest on top; the menu closes).",
     openFromStart: "Open start URL",
     openFromStartShift: "Shift+click: open configured start URL",
+    openMiddleClick: "Middle-click: open and stack above existing popouts",
     openInTab: "Open in tab",
     emptyState: "No shortcuts yet.",
     emptyAddFirst: "Add one",
