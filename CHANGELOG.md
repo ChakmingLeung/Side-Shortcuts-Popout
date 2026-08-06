@@ -1,6 +1,6 @@
 # Changelog
 
-**Language / 语言:** English below · [简体中文](#简体中文) below
+**Language / 语言:** Each release entry includes English and 简体中文 bullets.
 
 All notable changes to this project are documented here. Version numbers match `manifest.json`.
 
@@ -1008,15 +1008,3 @@ All notable changes to this project are documented here. Version numbers match `
 - 标签栏快速切换与状态保留
 - 工具栏导航与配置同步
 - 预置示例入口
-
----
-
-## 简体中文
-
-完整版本历史见上文英文条目；当前最新版本为 **1.1.1**。
-
-| 版本 | 要点 |
-|------|------|
-| 1.1.1 | 修复移动版误改 URL；白名单域名转换 |
-| 1.1.0 | 移动版 WAP、UA 注入、抖音支持 |
-| 1.0.0 | 侧边栏、标签切换、快捷入口管理 |
